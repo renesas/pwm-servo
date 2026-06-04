@@ -23,11 +23,7 @@ timer_spy_exe = executable(
 
 servo_test_exe = executable(
     'button-manager-test',
-    sources: [
-        timer_spy_code,
-        'test_servo.c',
-        'runners/test_servo_runner.c',
-    ],
+    sources: [timer_spy_code, 'test_servo.c', 'runners/test_servo_runner.c'],
     include_directories: include_dir_list,
     dependencies: [unity_dep, servo_dep],
 )

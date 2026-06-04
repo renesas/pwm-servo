@@ -17,12 +17,12 @@ typedef enum e_servo_direction_t
 {
     SERVO_DIRECTION_CLOCKWISE,
     SERVO_DIRECTION_COUNTERCLOCKWISE,
-} servo_direction_t ;
+} servo_direction_t;
 
 typedef struct st_servo_ctrl
 {
     bool open;
-    
+
     uint16_t steps;
 
     // Pointer to timer instance
@@ -61,6 +61,7 @@ fsp_err_t RM_SERVO_Open(servo_ctrl_t * const p_ctrl, const servo_cfg_t * const p
 fsp_err_t RM_SERVO_Close(servo_ctrl_t * const p_ctrl);
 fsp_err_t RM_SERVO_SetAngle(servo_ctrl_t * const p_ctrl, int16_t angle);
 fsp_err_t RM_SERVO_SetPercent(servo_ctrl_t * const p_ctrl, float percentage);
+
 // TODO: Better name for this function?
 fsp_err_t RM_SERVO_SetTimerCounts(servo_ctrl_t * const p_ctrl, uint32_t count);
 

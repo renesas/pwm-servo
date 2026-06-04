@@ -8,7 +8,7 @@ base_include_dirs = include_directories(
     [
         'include',
         'include/ra/fsp/inc/api',
-        'src/rm_servo'
+        'src/rm_servo',
         # 'include/ra_cfg/fsp_cfg',
     ],
 )
