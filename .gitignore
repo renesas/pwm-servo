@@ -1,0 +1,11 @@
+compile_commands.json
+bld
+
+.cache
+
+/subprojects/*
+!/subprojects/*.wrap
+doxy_out
+
+# python stuff
+*.egg-info

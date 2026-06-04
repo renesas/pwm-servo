@@ -1,0 +1,15 @@
+build-and-testjob:
+  stage: build
+  # Commented for now, these are to use a privileged runner
+  # tags:
+    # - na-dind
+    # - na-privileged
+  image:
+    name: debian:trixie-slim
+  script:
+    - apt update
+    - apt-get -y install meson ninja-build clang
+    # This is because we can't use ASAN on unprivileged runners.
+    - meson setup bld -Dunity:extension_fixture=true -Db_sanitize="none" -Db_lundef=false
+    - meson compile -C bld
+    - make test

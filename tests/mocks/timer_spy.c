@@ -1,0 +1,83 @@
+#include "timer_spy.h"
+#include "bsp_api.h"
+#include "r_timer_api.h"
+
+fsp_err_t R_TimerSpy_Open (timer_ctrl_t * const p_ctrl, timer_cfg_t const * const p_cfg)
+{
+    FSP_PARAMETER_NOT_USED(p_cfg);
+
+    timer_spy_ctrl_t * p_inst_ctrl = (timer_spy_ctrl_t *) p_ctrl;
+
+    if (p_inst_ctrl->open)
+    {
+        return FSP_ERR_ALREADY_OPEN;
+    }
+
+    p_inst_ctrl->open  = true;
+    p_inst_ctrl->state = TIMER_STATE_STOPPED;
+
+    return FSP_SUCCESS;
+}
+
+fsp_err_t R_TimerSpy_Close (timer_ctrl_t * const p_ctrl)
+{
+    timer_spy_ctrl_t * p_inst_ctrl = (timer_spy_ctrl_t *) p_ctrl;
+    if (!p_inst_ctrl->open)
+    {
+        return FSP_ERR_NOT_OPEN;
+    }
+
+    p_inst_ctrl->open  = false;
+    p_inst_ctrl->state = TIMER_STATE_UNKNOWN;
+
+    return FSP_SUCCESS;
+}
+
+fsp_err_t R_TimerSpy_Start (timer_ctrl_t * const p_ctrl)
+{
+    timer_spy_ctrl_t * p_inst_ctrl = (timer_spy_ctrl_t *) p_ctrl;
+    if (!p_inst_ctrl->open)
+    {
+        return FSP_ERR_NOT_OPEN;
+    }
+
+    p_inst_ctrl->state = TIMER_STATE_COUNTING;
+
+    return FSP_SUCCESS;
+}
+
+fsp_err_t R_TimerSpy_Stop (timer_ctrl_t * const p_ctrl)
+{
+    timer_spy_ctrl_t * p_inst_ctrl = (timer_spy_ctrl_t *) p_ctrl;
+    if (!p_inst_ctrl->open)
+    {
+        return FSP_ERR_NOT_OPEN;
+    }
+
+    p_inst_ctrl->state = TIMER_STATE_STOPPED;
+
+    return FSP_SUCCESS;
+}
+
+fsp_err_t R_TimerSpy_StatusGet (timer_ctrl_t * const p_ctrl, timer_status_t * const p_status)
+{
+    timer_spy_ctrl_t * p_inst_ctrl = (timer_spy_ctrl_t *) p_ctrl;
+    if (!p_inst_ctrl->open)
+    {
+        return FSP_ERR_NOT_OPEN;
+    }
+
+    p_status->state   = p_inst_ctrl->state;
+    p_status->counter = 0;
+
+    return FSP_SUCCESS;
+}
+
+const timer_api_t g_timer_on_timer_spy =
+{
+    .open      = &R_TimerSpy_Open,
+    .close     = &R_TimerSpy_Close,
+    .start     = &R_TimerSpy_Start,
+    .stop      = &R_TimerSpy_Stop,
+    .statusGet = &R_TimerSpy_StatusGet
+};
