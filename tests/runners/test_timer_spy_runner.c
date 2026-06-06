@@ -7,6 +7,7 @@ TEST_GROUP_RUNNER(TIMER_SPY)
     RUN_TEST_CASE(TIMER_SPY, test_already_open)
     RUN_TEST_CASE(TIMER_SPY, test_not_open_err)
     RUN_TEST_CASE(TIMER_SPY, test_timer_start_stop)
+    RUN_TEST_CASE(TIMER_SPY, test_timer_info_get)
 }
 
 static void runAllTests (void)
