@@ -15,9 +15,9 @@ servo_ctrl_t g_servo_ctrl;
 
 servo_cfg_t g_servo_cfg =
 {
-    .servo_direction      = SERVO_DIRECTION_CLOCKWISE,
-    .minimum_angle        = 0,
-    .maximum_angle        = 180,
+    .servo_direction      = SERVO_DIRECTION_COUNTERCLOCKWISE,
+    .minimum_angle        = -90,
+    .maximum_angle        = 90,
     .minimum_microseconds = 1000,
     .maximum_microseconds = 2000,
     .p_timer_instance     = &g_timer0_instance,

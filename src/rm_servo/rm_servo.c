@@ -63,7 +63,43 @@ fsp_err_t RM_SERVO_SetAngle (servo_ctrl_t * const p_ctrl, int16_t angle)
 {
     FSP_ERROR_RETURN(true == p_ctrl->open, FSP_ERR_NOT_OPEN);
 
-    return FSP_ERR_ASSERTION;
+    const timer_instance_t * p_servo_timer = p_ctrl->p_timer_instance;
+
+    int interval_counts = p_ctrl->maximum_angle - p_ctrl->minimum_angle;
+
+    // int pwm_range_microseconds = p_ctrl->maximum_microseconds - p_ctrl->minimum_microseconds;
+
+    // TODO: error when this fails
+    timer_info_t info;
+    fsp_err_t    err = p_servo_timer->p_api->infoGet(p_servo_timer->p_ctrl, &info);
+
+    int16_t angle_counts = p_ctrl->maximum_angle - p_ctrl->minimum_angle;
+
+    // Angle normalized to 0.
+    uint64_t adjusted_angle = angle - p_ctrl->minimum_angle;
+
+    if (SERVO_DIRECTION_COUNTERCLOCKWISE == p_ctrl->servo_direction)
+    {
+        adjusted_angle = angle_counts - adjusted_angle;
+    }
+
+    uint16_t min_us = p_ctrl->minimum_microseconds;
+    uint16_t max_us = p_ctrl->maximum_microseconds;
+
+    uint32_t period_us = ((uint64_t) info.period_counts * 1000000) / info.clock_frequency;
+
+    uint32_t counts_per_us = 1000000 / period_us;
+    uint64_t min_counts    = min_us * counts_per_us;
+    uint64_t max_counts    = max_us * counts_per_us;
+
+    volatile uint64_t pulse = min_counts +
+                              (adjusted_angle * (max_counts - min_counts)) /
+                              angle_counts;
+
+    // TODO: test for pin
+    p_ctrl->p_timer_instance->p_api->dutyCycleSet(p_servo_timer->p_ctrl, pulse, 0);
+
+    return FSP_SUCCESS;
 }
 
 fsp_err_t RM_SERVO_SetPercent (servo_ctrl_t * const p_ctrl, float percentage)

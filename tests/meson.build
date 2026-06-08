@@ -35,4 +35,4 @@ servo_test_exe = executable(
 )
 
 test('Timer Spy Test', timer_spy_exe)
-test('Timer Spy Test', servo_test_exe)
+test('Servo Test', servo_test_exe)
