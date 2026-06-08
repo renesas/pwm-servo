@@ -8,7 +8,6 @@ TEST_SETUP(SERVO)
 {
     fsp_err_t err = RM_SERVO_Open(&g_servo_ctrl, &g_servo_cfg);
     TEST_ASSERT_EQUAL(FSP_SUCCESS, err);
-
 }
 
 TEST_TEAR_DOWN(SERVO)
@@ -77,7 +76,7 @@ TEST(SERVO, servo_set_angle)
     // 60 + 90 = 150
     // 180 - 150 = 30
     // 30 / 180 = 0.166667ish
-    // 
+    //
     // (0.166666 * 50000) + 50000 is appx equal to 58333
     // The setangle call should set the period counts to be 58333
     fsp_err_t err = RM_SERVO_SetAngle(&g_servo_ctrl, 60);
