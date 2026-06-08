@@ -8,6 +8,7 @@ typedef struct st_timer_ctrl
 {
     bool          open;
     timer_state_t state;
+    uint32_t      duty_cycle;
 } timer_spy_ctrl_t;
 
 struct timer_spy_state * timer_spy_get_state(void);
@@ -20,7 +21,8 @@ fsp_err_t R_TimerSpy_Start(timer_ctrl_t * const p_ctrl);
 // fsp_err_t R_TimerSpy_Enable(timer_ctrl_t * const p_ctrl);
 // fsp_err_t R_TimerSpy_Disable(timer_ctrl_t * const p_ctrl);
 // fsp_err_t R_TimerSpy_PeriodSet(timer_ctrl_t * const p_ctrl, uint32_t const period_counts);
-// fsp_err_t R_TimerSpy_DutyCycleSet(timer_ctrl_t * const p_ctrl, uint32_t const duty_cycle_counts, uint32_t const pin);
+fsp_err_t R_TimerSpy_DutyCycleSet(timer_ctrl_t * const p_ctrl, uint32_t const duty_cycle_counts, uint32_t const pin);
+
 // fsp_err_t R_TimerSpy_CompareMatchSet(timer_ctrl_t * const        p_ctrl,
 // uint32_t const              compare_match_value,
 // timer_compare_match_t const match_channel);

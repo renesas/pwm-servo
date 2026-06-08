@@ -72,12 +72,23 @@ fsp_err_t R_TimerSpy_InfoGet (timer_ctrl_t * const p_ctrl, timer_info_t * const 
     return FSP_SUCCESS;
 }
 
+fsp_err_t R_TimerSpy_DutyCycleSet (timer_ctrl_t * const p_ctrl, uint32_t const duty_cycle_counts, uint32_t const pin)
+{
+    timer_spy_ctrl_t * p_inst_ctrl = (timer_spy_ctrl_t *) p_ctrl;
+    FSP_ERROR_RETURN(true == p_inst_ctrl->open, FSP_ERR_NOT_OPEN);
+
+    p_inst_ctrl->duty_cycle = duty_cycle_counts;
+
+    return FSP_SUCCESS;
+}
+
 const timer_api_t g_timer_on_timer_spy =
 {
-    .open      = &R_TimerSpy_Open,
-    .close     = &R_TimerSpy_Close,
-    .start     = &R_TimerSpy_Start,
-    .stop      = &R_TimerSpy_Stop,
-    .statusGet = &R_TimerSpy_StatusGet,
-    .infoGet   = &R_TimerSpy_InfoGet
+    .open         = &R_TimerSpy_Open,
+    .close        = &R_TimerSpy_Close,
+    .start        = &R_TimerSpy_Start,
+    .stop         = &R_TimerSpy_Stop,
+    .statusGet    = &R_TimerSpy_StatusGet,
+    .infoGet      = &R_TimerSpy_InfoGet,
+    .dutyCycleSet = &R_TimerSpy_DutyCycleSet
 };

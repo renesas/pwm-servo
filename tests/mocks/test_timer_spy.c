@@ -66,6 +66,9 @@ TEST(TIMER_SPY, test_not_open_err)
     timer_info_t p_info;
     err = R_TimerSpy_InfoGet(&g_timer_spy_ctrl, &p_info);
     TEST_ASSERT_EQUAL_INT(FSP_ERR_NOT_OPEN, err);
+
+    err = R_TimerSpy_DutyCycleSet(&g_timer_spy_ctrl, 10000, 0);
+    TEST_ASSERT_EQUAL_INT(FSP_ERR_NOT_OPEN, err);
 }
 
 TEST(TIMER_SPY, test_timer_start_stop)
@@ -96,4 +99,15 @@ TEST(TIMER_SPY, test_timer_info_get)
     TEST_ASSERT_EQUAL_UINT32(48000000, p_info.clock_frequency);
     TEST_ASSERT_EQUAL(TIMER_DIRECTION_UP, p_info.count_direction);
     TEST_ASSERT_EQUAL_UINT32(65000, p_info.period_counts);
+}
+
+TEST(TIMER_SPY, test_timer_duty_cycle_set)
+{
+    R_TimerSpy_Open(&g_timer_spy_ctrl, &g_timer_spy_cfg);
+    R_TimerSpy_Start(&g_timer_spy_ctrl);
+
+    fsp_err_t err = R_TimerSpy_DutyCycleSet(&g_timer_spy_ctrl, 10000, 0);
+    TEST_ASSERT_EQUAL(FSP_SUCCESS, err);
+
+    TEST_ASSERT_EQUAL(10000, g_timer_spy_ctrl.duty_cycle);
 }
