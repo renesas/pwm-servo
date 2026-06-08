@@ -96,9 +96,9 @@ TEST(TIMER_SPY, test_timer_info_get)
     fsp_err_t    err = R_TimerSpy_InfoGet(&g_timer_spy_ctrl, &p_info);
     TEST_ASSERT_EQUAL_INT(FSP_SUCCESS, err);
 
-    TEST_ASSERT_EQUAL_UINT32(48000000, p_info.clock_frequency);
+    TEST_ASSERT_EQUAL_UINT32(50000000, p_info.clock_frequency);
     TEST_ASSERT_EQUAL(TIMER_DIRECTION_UP, p_info.count_direction);
-    TEST_ASSERT_EQUAL_UINT32(65000, p_info.period_counts);
+    TEST_ASSERT_EQUAL_UINT32(1000000, p_info.period_counts);
 }
 
 TEST(TIMER_SPY, test_timer_duty_cycle_set)

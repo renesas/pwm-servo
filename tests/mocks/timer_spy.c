@@ -65,9 +65,9 @@ fsp_err_t R_TimerSpy_InfoGet (timer_ctrl_t * const p_ctrl, timer_info_t * const 
     timer_spy_ctrl_t * p_inst_ctrl = (timer_spy_ctrl_t *) p_ctrl;
     FSP_ERROR_RETURN(true == p_inst_ctrl->open, FSP_ERR_NOT_OPEN);
 
-    p_info->clock_frequency = 48000000;
+    p_info->clock_frequency = 50000000;
     p_info->count_direction = TIMER_DIRECTION_UP;
-    p_info->period_counts   = 65000;
+    p_info->period_counts   = 1000000;
 
     return FSP_SUCCESS;
 }
