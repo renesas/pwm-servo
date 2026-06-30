@@ -1,0 +1,19 @@
+T4EC8 000:002.920   SEGGER J-Link V9.42 Log File
+T4EC8 000:003.143   DLL Compiled: May  6 2026 12:25:27
+T4EC8 000:003.167   Logging started @ 2026-06-25 20:39
+T4EC8 000:003.187   Process: C:\Users\a5132247\.eclipse\com.renesas.platform_1584587709\DebugComp\RA\e2-server-gdb.exe
+T4EC8 000:003.211 - 3.207ms 
+T4EC8 000:003.245 JLINK_GetDLLVersion()
+T4EC8 000:003.275 - 0.031ms returns 94200
+T4EC8 000:011.211 JLINK_OpenEx(...)
+T4EC8 000:019.663   Looking for J-Link GUI Server exe at: C:\Users\a5132247\.eclipse\com.renesas.platform_1584587709\DebugComp\RA\ARM\Segger_v9.42.0\JLinkGUIServer.exe
+T4EC8 000:020.159   Looking for J-Link GUI Server exe at: \JLinkGUIServer.exe
+T4EC8 000:322.720   Failed to connect to J-Link GUI Server.
+T4EC8 000:322.874   
+  ***** Error: 
+T4EC8 000:322.925   Cannot connect to the probe/programmer.
+T4EC8 000:323.331 - 312.121ms returns "Cannot connect to the probe/programmer."
+T4EC8 001:931.846 JLINK_Close()
+T4EC8 001:933.065 - 1.217ms
+T4EC8 001:933.116   
+T4EC8 001:933.141   Closed
