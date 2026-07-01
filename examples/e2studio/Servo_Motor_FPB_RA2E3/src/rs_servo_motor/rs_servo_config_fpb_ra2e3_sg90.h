@@ -15,10 +15,6 @@ extern const timer_instance_t g_pwm_sg90_preset;
 extern gpt_instance_ctrl_t g_pwm_sg90_ctrl_preset;
 extern const timer_cfg_t g_pwm_sg90_cfg_preset;
 
-#ifndef NULL
-void NULL(timer_callback_args_t *p_args);
-#endif
-
 FSP_FOOTER
 #endif /* SERVO_MOTOR_CONFIG_SG90_FPB_RA2E3_H_ */
 #endif  //Use pre-set configuration for SG90 Servo Motor
