@@ -8,6 +8,8 @@
 #define RS_SERVO_DELAY_1S        (1000)
 #define RS_SERVO_US_PER_SECOND   (1000000ULL)
 #define RS_SERVO_MAX_PERCENTAGE  (100U)
+#define RS_SERVO_MAX_ANGLE_CFG   (360)
+#define RS_SERVO_MIN_ANGLE_CFG   (-180)
 
 fsp_err_t rs_servo_SweepRangeOnce(servo_ctrl_t *p_servo_ctrl, const servo_device_cfg_t *p_motor_cfg)
 {
@@ -52,7 +54,6 @@ fsp_err_t rs_servo_SweepRangeOnce(servo_ctrl_t *p_servo_ctrl, const servo_device
     return err;
 }
 
-
 fsp_err_t rs_servo_Open(servo_ctrl_t *p_servo_ctrl, const servo_device_cfg_t *p_motor_cfg)
 {
     fsp_err_t err = FSP_SUCCESS;
@@ -70,14 +71,18 @@ fsp_err_t rs_servo_Open(servo_ctrl_t *p_servo_ctrl, const servo_device_cfg_t *p_
 #endif
     if(err) return err;
 
-    /* Assign the servo motor configurations. */
+    /* Assign the servo motor device configurations. */
     p_servo_ctrl->p_device = p_motor_cfg;
+
+    /* Check that the servo control block has the right timer and servo motor device configuration. */
+    err = rs_servo_config_check(p_servo_ctrl);
+    if(err) return err;
 
     /* Calculate the one-time values. */
     err = rs_servo_calculate_onetime_values(p_servo_ctrl);
     if(err) return err;
 
-    /* Identify output pin used. */
+    /* Identify output pin used for the timer. */
     if( (p_servo_ctrl->timer_cfg_extend.gtioca.output_enabled == true )
             && (p_servo_ctrl->timer_cfg_extend.gtiocb.output_enabled == false)  )
     {
@@ -107,58 +112,6 @@ fsp_err_t rs_servo_Open(servo_ctrl_t *p_servo_ctrl, const servo_device_cfg_t *p_
 
     /* Mark the servo control instance as open. */
     p_servo_ctrl->open = true;
-
-    return err;
-}
-
-fsp_err_t rs_servo_config_gen(servo_ctrl_t *p_servo_ctrl, const timer_instance_t * p_timer_pwm)
-{
-    fsp_err_t err = FSP_SUCCESS;
-
-    /* Check parameters. */
-    FSP_ERROR_RETURN(NULL != p_servo_ctrl, FSP_ERR_INVALID_POINTER);
-    FSP_ERROR_RETURN(NULL != p_timer_pwm, FSP_ERR_INVALID_POINTER);
-
-    /* Initialize configuration. */
-    memset(&p_servo_ctrl->timer_cfg, 0, sizeof(timer_cfg_t));
-    memset(&p_servo_ctrl->timer_cfg_extend, 0, sizeof(gpt_extended_cfg_t));
-
-    /* Copy configurations from the timer instance used into SRAM. */
-    memcpy(&p_servo_ctrl->timer_cfg, p_timer_pwm->p_cfg, sizeof(timer_cfg_t));
-    memcpy(&p_servo_ctrl->timer_cfg_extend, p_timer_pwm->p_cfg->p_extend,  sizeof(gpt_extended_cfg_t));
-
-    /* Manually assign addresses of p_extend to the extended configs in SRAM. */
-    p_servo_ctrl->timer_cfg.p_extend = (gpt_extended_cfg_t *) &p_servo_ctrl->timer_cfg_extend;
-
-    /* Build instance of the public timer wrapper by assigning pointers to its members. */
-    p_servo_ctrl->timer.p_ctrl = &p_servo_ctrl->timer_ctrl;
-    p_servo_ctrl->timer.p_cfg = &p_servo_ctrl->timer_cfg;
-    p_servo_ctrl->timer.p_api = p_timer_pwm->p_api;
-
-    return err;
-}
-
-fsp_err_t rs_servo_calculate_onetime_values(servo_ctrl_t *p_servo_ctrl)
-{
-
-    fsp_err_t err = FSP_SUCCESS;
-    timer_info_t timer_info;
-    memset(&timer_info, 0, sizeof(timer_info_t));
-
-    /* Check parameters. */
-    FSP_ERROR_RETURN(NULL != p_servo_ctrl, FSP_ERR_INVALID_POINTER);
-    FSP_ERROR_RETURN(NULL != p_servo_ctrl->p_device, FSP_ERR_INVALID_POINTER);
-
-    /* Set the total counts per period. */
-    err = p_servo_ctrl->timer.p_api->infoGet(p_servo_ctrl->timer.p_ctrl, &timer_info);
-    p_servo_ctrl->period_counts = timer_info.period_counts;
-
-    /* Set the min and max counts based on the specified min/max microsecond values in the servo cfg. */
-    p_servo_ctrl->min_duty_counts = (uint32_t) ((((uint64_t) p_servo_ctrl->p_device->minimum_microseconds) *
-                                 timer_info.clock_frequency) / RS_SERVO_US_PER_SECOND);
-
-    p_servo_ctrl->max_duty_counts = (uint32_t) ((((uint64_t) p_servo_ctrl->p_device->maximum_microseconds) *
-                                 timer_info.clock_frequency) / RS_SERVO_US_PER_SECOND);
 
     return err;
 }
@@ -249,5 +202,79 @@ fsp_err_t rs_servo_Close(servo_ctrl_t *p_servo_ctrl)
     p_servo_ctrl->open = false;
 
     return FSP_SUCCESS;
+}
+
+fsp_err_t rs_servo_config_gen(servo_ctrl_t *p_servo_ctrl, const timer_instance_t * p_timer_pwm)
+{
+    fsp_err_t err = FSP_SUCCESS;
+
+    /* Check parameters. */
+    FSP_ERROR_RETURN(NULL != p_servo_ctrl, FSP_ERR_INVALID_POINTER);
+    FSP_ERROR_RETURN(NULL != p_timer_pwm, FSP_ERR_INVALID_POINTER);
+
+    /* Initialize configuration. */
+    memset(&p_servo_ctrl->timer_cfg, 0, sizeof(timer_cfg_t));
+    memset(&p_servo_ctrl->timer_cfg_extend, 0, sizeof(gpt_extended_cfg_t));
+
+    /* Copy configurations from the timer instance used into SRAM. */
+    memcpy(&p_servo_ctrl->timer_cfg, p_timer_pwm->p_cfg, sizeof(timer_cfg_t));
+    memcpy(&p_servo_ctrl->timer_cfg_extend, p_timer_pwm->p_cfg->p_extend,  sizeof(gpt_extended_cfg_t));
+
+    /* Manually assign addresses of p_extend to the extended configs in SRAM. */
+    p_servo_ctrl->timer_cfg.p_extend = (gpt_extended_cfg_t *) &p_servo_ctrl->timer_cfg_extend;
+
+    /* Build instance of the public timer wrapper by assigning pointers to its members. */
+    p_servo_ctrl->timer.p_ctrl = &p_servo_ctrl->timer_ctrl;
+    p_servo_ctrl->timer.p_cfg = &p_servo_ctrl->timer_cfg;
+    p_servo_ctrl->timer.p_api = p_timer_pwm->p_api;
+
+    return err;
+}
+
+fsp_err_t rs_servo_config_check(const servo_ctrl_t * p_servo_ctrl)
+{
+    fsp_err_t err = FSP_SUCCESS;
+
+    /* Check parameters. */
+    FSP_ERROR_RETURN(NULL != p_servo_ctrl, FSP_ERR_INVALID_POINTER);
+
+    /* Control block must have a servo device configuration. */
+    FSP_ERROR_RETURN(NULL != p_servo_ctrl->p_device, FSP_ERR_INVALID_POINTER);
+
+    /* Check that the servo device configurations are acceptable. */
+    FSP_ERROR_RETURN(p_servo_ctrl->p_device->minimum_angle >= RS_SERVO_MIN_ANGLE_CFG, FSP_ERR_INVALID_MODE);
+    FSP_ERROR_RETURN(p_servo_ctrl->p_device->maximum_angle <= RS_SERVO_MAX_ANGLE_CFG, FSP_ERR_INVALID_MODE)
+    FSP_ERROR_RETURN( (p_servo_ctrl->p_device->direction == SERVO_DIRECTION_CLOCKWISE) || (p_servo_ctrl->p_device->direction == SERVO_DIRECTION_COUNTERCLOCKWISE),  FSP_ERR_INVALID_MODE);
+
+    /* Ensure the public timer wrapper encapsulates the ctrl, cfg, and extended cfg. */
+    FSP_ERROR_RETURN(p_servo_ctrl->timer.p_ctrl == &p_servo_ctrl->timer_ctrl, FSP_ERR_INVALID_POINTER);
+    FSP_ERROR_RETURN(p_servo_ctrl->timer.p_cfg == &p_servo_ctrl->timer_cfg, FSP_ERR_INVALID_POINTER);
+    FSP_ERROR_RETURN(p_servo_ctrl->timer.p_cfg->p_extend == &p_servo_ctrl->timer_cfg_extend, FSP_ERR_INVALID_POINTER);
+
+    return err;
+}
+fsp_err_t rs_servo_calculate_onetime_values(servo_ctrl_t *p_servo_ctrl)
+{
+
+    fsp_err_t err = FSP_SUCCESS;
+    timer_info_t timer_info;
+    memset(&timer_info, 0, sizeof(timer_info_t));
+
+    /* Check parameters. */
+    FSP_ERROR_RETURN(NULL != p_servo_ctrl, FSP_ERR_INVALID_POINTER);
+    FSP_ERROR_RETURN(NULL != p_servo_ctrl->p_device, FSP_ERR_INVALID_POINTER);
+
+    /* Set the total counts per period. */
+    err = p_servo_ctrl->timer.p_api->infoGet(p_servo_ctrl->timer.p_ctrl, &timer_info);
+    p_servo_ctrl->period_counts = timer_info.period_counts;
+
+    /* Set the min and max counts based on the specified min/max microsecond values in the servo cfg. */
+    p_servo_ctrl->min_duty_counts = (uint32_t) ((((uint64_t) p_servo_ctrl->p_device->minimum_microseconds) *
+                                 timer_info.clock_frequency) / RS_SERVO_US_PER_SECOND);
+
+    p_servo_ctrl->max_duty_counts = (uint32_t) ((((uint64_t) p_servo_ctrl->p_device->maximum_microseconds) *
+                                 timer_info.clock_frequency) / RS_SERVO_US_PER_SECOND);
+
+    return err;
 }
 

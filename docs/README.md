@@ -16,16 +16,66 @@ A complete e² studio example project is included to showcase continuous servo s
 
 The repository is organized into major areas:
 | Area | Purpose|
-|--------|---------|
-
-## Project Structure
-List of the files as they exist in the repo, and their purpose.
+|-|-|
+| docs/ | Documentation for the rs_servo public instance and demonstration.|
+| examples/ | Complete reference project(s) for hardware evaluation and demonstration. |
+| src/ | Reusable configuration, public functions, and demonstration files. |
 
 ## Table of Contents
 
+1. [Servo Motor Control Theory](#1-servo-motor-control-theory)
+    - 1.1 [Choosing the Right FSP Timer Peripheral](#11-choosing-the-right-fsp-timer-peripheral)
+        - 1.1.1 [Servo Pulse-Width Resolution](#111-servo-pulse-width-resolution)
+        - 1.1.2 [Timer Configuration Constraints](#112-timer-configuration-constraints)
+        - 1.1.3 [Timer Tick Resolution](#113-timer-tick-resolution)
+        - 1.1.4 [Peripheral Selection](#114-peripheral-selection)
+    - 1.2 [Calculating Duty-Cycles at Runtime](#12-calculating-duty-cycles-at-runtime)
+        - 1.2.1 [One-time Values](#121-one-time-values)
+        - 1.2.2 [Position Control by Angle](#122-position-control-by-angle)
+        - 1.2.3 [Position Control by Percentage](#123-position-control-by-percentage)
+2. [Application Overview](#2-application-overview)
+    - 2.1 [Hardware](#21-hardware)
+        - 2.1.1 [FPB-RA2E3 Timer Selection](#211-fpb-ra2e3-timer-selection)
+    - 2.2 [FSP Modules Used](#22-fsp-modules-used)
+        - 2.2.1 [Module Configurations](#221-module-configurations)
+        - 2.2.2 [Pin Configurations](#222-pin-configurations)
+3. [Public Function Layer: rs_servo](#3-public-function-layer-rs_servo)
+    - 3.1 [Files](#31-files)
+    - 3.2 [Public Data](#32-public-data)
+        - 3.2.1 [Macros](#321-macros)
+        - 3.2.2 [Servo Direction Enum](#322-servo-direction-enum)
+        - 3.2.3 [Servo Device Configuration](#323-servo-device-configuration)
+        - 3.2.4 [Servo Control Block](#324-servo-control-block)
+    - 3.3 [Public Functions](#33-public-functions)
+        - 3.3.1 [rs_servo_SweepRangeOnce()](#331-rs_servo_sweeprangeonce)
+        - 3.3.2 [rs_servo_Open()](#332-rs_servo_open)
+        - 3.3.3 [rs_servo_Close()](#333-rs_servo_close)
+        - 3.3.4 [rs_servo_WriteAngle()](#334-rs_servo_writeangle)
+        - 3.3.5 [rs_servo_WritePercent()](#335-rs_servo_writepercent)
+        - 3.3.6 [Internal Functions](#336-internal-functions)
+    - 3.4 [Demo Application](#34-demo-application)
+        - 3.4.1 [Using FSP Stack vs Preset Configurations](#341-using-fsp-stack-vs-preset-configurations)
+4. [Running the Demo Application](#4-running-the-demo-application)
+    - 4.1 [Required Resources](#41-required-resources)
+        - 4.1.1 [Hardware](#411-hardware)
+        - 4.1.2 [Software](#412-software)
+    - 4.2 [Steps to Run](#42-steps-to-run)
+5. [Limitations](#5-limitations)
+6. [Integration / Reusability](#6-integration--reusability)
+    - 6.1 [Inside the Demo Application](#61-inside-the-demo-application)
+        - 6.1.1 [Demo Application Using FSP Configuration](#611-demo-application-using-fsp-configuration)
+        - 6.1.2 [Demo Application Using a Different Servo Motor](#612-demo-application-using-a-different-servo-motor)
+    - 6.2 [Inside a Custom Application](#62-inside-a-custom-application)
+        - 6.2.1 [Public Function Layer](#621-public-function-layer)
+        - 6.2.2 [GPT Timer Configuration](#622-gpt-timer-configuration)
+        - 6.2.3 [Public Data Configuration](#623-public-data-configuration)
+        - 6.2.4 [Servo Initialization](#624-servo-initialization)
+        - 6.2.5 [Servo Position Update](#625-servo-position-update)
+        - 6.2.6 [Servo Shut-down](#626-servo-shut-down)
+        - 6.2.7 [Drive Multiple Servo Motors](#627-drive-multiple-servo-motors)
 
 ***
-# Servo Motor Control Theory
+# 1. Servo Motor Control Theory
 An RC servo is controlled through a PWM signal, which is a series of repeating pulses of variable width. 
 The width of the pulse determines the angular position of the servo. 
 
@@ -38,7 +88,7 @@ The parameters are also commonly referred to as the minumum duty cycle, maximum 
 
 Standard 180-degree servos have parameter values of 1ms, 2ms, and 20ms (50 Hz), respectively. There are some servos with values that stray from this norm, but it is uncommon.
 
-## Choosing the Right FSP Timer Peripheral
+## 1.1 Choosing the Right FSP Timer Peripheral
 On RA2 MCUs both the AGT (Asynchronous General Purpose Timer) and GPT (General PWM Timer) peripherals are capable of generating PWM signals to control servos.
 On all RA MCUs this list expands to include the TAU (Timer Array Unit) and the ULPT (Ultra Low-Power Timer). 
 
@@ -50,7 +100,7 @@ Essentially this is answering the following in combination:
 * Can the timer achieve the right resolution to represent every position of the servo? 
 * Can the timer counter width fit the full servo PWM period? 
 
-### Servo Pulse-Width Resolution
+### 1.1.1 Servo Pulse-Width Resolution
 The servo's minimum pulse-width change between adjacent positions can be referred to as the servo's pulse-width resolution. 
 
 To calculate, use the following formula:
@@ -61,7 +111,7 @@ Pulse-Width Resolution = ------------------------------------------
                                     Number of Positions
 ```
  
-### Timer Configuration Constraints
+### 1.1.2 Timer Configuration Constraints
 The timer peripheral's configured clock source frequency and divider must allow the servo's PWM period to fit within the timer's maximum counter value. 
 
 The maximum timer count is determined by the timer's counter width (in bits):
@@ -85,7 +135,7 @@ Required Counts ≤ Maximum Timer Count
 
 Use the Hardware User's Manual to verify the clock source and divider values are valid settings for the timer in question.
 
-### Timer Tick Resolution
+### 1.1.3 Timer Tick Resolution
 Once a valid source clock frequecy and divider combination is found, use the following formula to verify the resolution between timer ticks:
 
 ```text
@@ -93,7 +143,7 @@ Once a valid source clock frequecy and divider combination is found, use the fol
 Tick Resolution = ---------------
                     Clock Source
 ```
-### Peripheral Selection
+### 1.1.4 Peripheral Selection
 For precise motor positioning, the timer tick resolution must be finer than the minimum pulse-width change between adjacent positions of the servo.
 If not, multiple servo positions may map to the same timer count value, reducing positioning accuracy.
 
@@ -102,14 +152,14 @@ Ensure:
 Timer Tick Resolution < Servo Pulse-Width Resolution
 ```
 
-## Calculating Duty-Cycles at Runtime
+## 1.2 Calculating Duty-Cycles at Runtime
 Servo position is controlled by varying the PWM pulse width. Each valid servo position corresponds to a pulse width between the specified minimum and maximum duty cycles.
 
 Each FSP timer's drivers include a `DutyCycleSet()` API to update the PWM pulse width at runtime. It accepts the new duty cycle value in units of raw timer counts. 
 
 The maximum raw timer count (determined by the timer's counter width) represents the servo's full PWM period. To set a specific servo position, calculate a new pulse width (in raw counts) as the right fraction between the servo's minimum and maximum pulse widths.
 
-### One-time Values
+### 1.2.1 One-time Values
 Firstly, calculate the servo's minumum and maximum duty cycles as raw timer counts. Then use these values to calculate subsequent updates to timer's PWM duty cycle.
 
 The FSP timer API `InfoGet()` can get the clock frequency and clock period (in raw counts) of any open timer.
@@ -128,7 +178,7 @@ Maximum Duty Count =  -----------------------------------------------
                                     (# us per second)
 ```
 
-### Position Control by Angle
+### 1.2.2 Position Control by Angle
 The most common control method is to specify a target angle. The driver converts the requested angle into the corresponding duty-cycle count between the configured minimum and maximum pulse widths.
 
 For a 180° servo, this provides up to 180 discrete position steps across the servo's operating range.
@@ -142,7 +192,7 @@ Duty Cycle Count = Minimum Duty Count + --------------- x (Maximum Duty Count - 
                                           # of Angles
 ```
 
-### Position Control by Percentage
+### 1.2.3 Position Control by Percentage
 An alternative control method is to specify the desired position as a percentage of the servo's travel range. A value of 0% corresponds to the minimum pulse width, while 100% corresponds to the maximum pulse width.
 
 This approach provides 100 discrete position steps across the servo's operating range.
@@ -156,7 +206,7 @@ Duty Cycle Count = Minimum Duty Count + ---------------- x (Maximum Duty Count -
 
 ***
 
-# Application Overview
+# 2. Application Overview
 This project applies the servo control theory described in the previous sections to control an SG90 servo motor connected to an FPB-RA2E3 board. 
 
 After initialization, the application continuously sweeps the servo shaft through its full range of motion by stepping through each angle from 0° to 180°, returning back to 0°, and pausing for one second before repeating the cycle. 
@@ -165,14 +215,14 @@ The project provides a public function layer which includes routines for setting
 
 Together, these features demonstrate how RA MCU timer peripherals can be used to implement accurate and reusable servo motor control.
 
-## Hardware
+## 2.1 Hardware
 The demo application runs on the following hardware: 
 * FPB-RA2E3 MCU
     * [RA2E3 Group User's Manual: Hardware ](https://www.renesas.com/en/document/mah/ra2e3-group-users-manual-hardware)
 * SG90 Servo Motor
     * [SG90 Datasheet ](http://www.ee.ic.ac.uk/pcheung/teaching/DE1_EE/stores/sg90_datasheet.pdf)
 
-### FPB-RA2E3 Timer Selection
+### 2.1.1 FPB-RA2E3 Timer Selection
 This section follows the analysis outlined in the Servo Motor Control Theory subsection Choosing the Right FSP Timer Peripheral.
 
 The SG90 is a 180° clockwise-rotating servo with the following PWM pulse parameters
@@ -228,14 +278,14 @@ Solve the following equation for the right division ratio (DIV) when PCLKB's inp
 
 Rounding up to the closest valid ratio gives DIV = 16. However, notice that the the max clock division ratio setting is /8. So this AGT module is not able to create a PWM signal that can represent every anglular position of the servo motor. 
 
-## FSP Modules Used
+## 2.2 FSP Modules Used
 The following module is used in the servo example project: 
 
 | Module | Usage |
 |--------|------------------|
 | GPT | Create a variable duty-cycle PWM signal to control the SG90 motor |
 
-### Module Configurations
+### 2.2.1 Module Configurations
 The following non-default FSP properties enable the R_GPT to control the SG90 servo:
 
 | Property Name | Value Used | Reason |
@@ -250,17 +300,18 @@ The following non-default FSP properties enable the R_GPT to control the SG90 se
 | Output → GTIOCB Output Enabled | True | Choose any non-conflicting output pin on either GTIOCA or B to output the PWM control signal. In this example the output is assigned to P212 on GTIOC0B. |
 | Pins → GTIOCB | 212 | Ensure the pin settings to make 212 available as GTIOCB output. |
 
-### Pin Configurations 
+### 2.2.2 Pin Configurations 
 The following pin configurations used in the project route the GPT PWM signal to output pin P212 on GTIOCB. 
 
 <img src="images/pin_config.png" alt="The Demo's GPT Pin Settings" width="450"/><br>
 
+***
 
-## Public Function Layer: rs_servo
+# 3 Public Function Layer: rs_servo
 
 The servo motor public function layer **rs_servo** is detailed here.
 
-### Files
+## 3.1 Files
 The source files can be found in the repo's /src folder and are located in the e² studio project's /src/rs_servo_motor folder. 
 
 | File | Contents |
@@ -273,10 +324,10 @@ The source files can be found in the repo's /src folder and are located in the e
 
 > ℹ To use the **rs_servo** layer, copy the rs_servo_functions .c and .h file into the target project's source folder. Include the rs_servo_function.h file in each application file that uses the layer.
 
-### Public Data
+## 3.2 Public Data
 The public data are defined in rs_servo_functions.h. The data is composed of an enumeration for the servo direction, a configuration struct for the servo's specifications, and a control struct for the public function layer.
 
-#### Macros
+### 3.2.1 Macros
 The following macros are defined in the rs_servo_functions.c file and support the public functions.
 
 | Name | Value | Use |
@@ -286,18 +337,20 @@ The following macros are defined in the rs_servo_functions.c file and support th
 | RS_SERVO_DELAY_US_PER_SECOND | 1000000ULL | The number of microseconds in a second. Used in the servo position update functions to calculate the new duty cycle count. |
 | RS_SERVO_MAX_PERCENTAGE | 100 | Maximum percent. Used in the write percent function to ensure valid input. |
 
-```text
+```c
 #define RS_SERVO_DELAY_100MS     (100)
 #define RS_SERVO_DELAY_1S        (1000)
 #define RS_SERVO_US_PER_SECOND   (1000000ULL)
 #define RS_SERVO_MAX_PERCENTAGE  (100U)
+#define RS_SERVO_MAX_ANGLE_CFG   (360)
+#define RS_SERVO_MIN_ANGLE_CFG   (-180)
 ```
 
-#### Servo Direction Enum
+### 3.2.2 Servo Direction Enum
 
 The type *servo_direction_t* provides the directions that can describe the servo's rotation. 
 
-```text
+```c
 /* Servo Direction Enum */
 typedef enum e_servo_direction_t
 {
@@ -306,7 +359,7 @@ typedef enum e_servo_direction_t
 } servo_direction_t;
 ```
 
-#### Servo Device Configuration
+### 3.2.3 Servo Device Configuration
 
 The type *servo_device_t* is dependent on the selected servo's hardware and describes its PWM pulse's specifications and shaft's rotational direction.
 
@@ -322,7 +375,7 @@ The type *servo_device_t* is dependent on the selected servo's hardware and desc
 
 > ℹ Depending on preference, a 180° servo motor's angle range can be specified either from -90° to 90° or from 0° to 180°. And similarly, 360° motors can be either -180° to 180 or 0 to 360°. The public functions will verify input are within this range. 
 
-```text
+```c
 /* Servo Device Configuration */
 typedef struct st_servo_device_cfg
 {
@@ -335,7 +388,7 @@ typedef struct st_servo_device_cfg
 ```
 
 The SG90 demo application in rs_servo_demo_sg90.c defines the servo range from -90° to 90° and maps it to a pulse width from 1000 µs to 2000 µs.
-```text
+```c
 const servo_device_cfg_t g_sg90_motor_cfg =
 {
     .minimum_angle = -90,
@@ -345,7 +398,7 @@ const servo_device_cfg_t g_sg90_motor_cfg =
     .direction = SERVO_DIRECTION_CLOCKWISE
 };
 ```
-#### Servo Control Block
+### 3.2.4 Servo Control Block
 
 The type *servo_ctrl_t* provides a control block for the **rs_servo** functions. To guarantee proper operation of this layer, application code should never write over any members of a *servo_ctrl_t* instance. 
 
@@ -365,11 +418,11 @@ The type *servo_ctrl_t* provides a control block for the **rs_servo** functions.
 | max_duty_counts | uint32_t | The number of timer counts for the servo's maximum PWM duty cycle. This value is calculated once per open. |
 
 The SG90 demo application in rs_servo_demo_sg90.c creates a control instance for each servo motor.
- ```text
+ ```c
  servo_ctrl_t g_sg90_servo_ctrl = {0};
  ```
 
-### Public Functions
+## 3.3 Public Functions
 
 The public functions are defined in the file rs_servo_functions.c. 
 
@@ -387,6 +440,7 @@ This section breaks down the servo functions for a beginner user and an advanced
 | rs_servo_WriteAngle(servo_ctrl_t *, int16_t) | Open | Advanced | Moves the servo to a requested angle within the configured range. |
 | rs_servo_WritePercent(servo_ctrl_t * p_servo_ctrl, uint8_t percent) | Open | Advanced | Moves the servo to the requested position within the configured range. |
 | rs_servo_config_gen(servo_ctrl_t *, const timer_instance_t *) | - | INTERNAL ONLY | During open, copies the selected FSP timer instance configuration into the servo control structure. |
+| rs_servo_config_check(const servo_ctrl_t *) | - | INTERNAL ONLY | After config gen, checks that the servo control members the servo motor device configurations are correct. |
 | rs_servo_calculate_onetime_values(servo_ctrl_t *) | - | INTERNAL ONLY | During open, calculates runtime values that are used in subsequent calls to WritePercent() or WriteAngle() to calculate the new duty cycle. |
 
 All functions returns a fsp_err_t value to describe the success of the function's operation:
@@ -395,14 +449,15 @@ All functions returns a fsp_err_t value to describe the success of the function'
 | *FSP_SUCCESS* | The function returned successfully with no error. |
 | *FSP_ERR_INVALID_POINTER* | Pointer points to an invalid memory location. |
 | *FSP_ERR_INVALID_ARGUMENT* | Invalid input parameter. |
+| *FSP_ERR_INVALID_MODE* | The current settings are unsupported or an incorrect mode. |
 | *FSP_ERR_ALREADY_OPEN* | The module is already open, which is an invalid state. |
 | *FSP_ERR_NOT_OPEN* | The module is not open, which is an invalid state. |
 
-#### rs_servo_SweepRangeOnce() 
+### 3.3.1 rs_servo_SweepRangeOnce() 
 Beginner-level single entry point function to the **rs_servo**. <br>
 Valid Module State: Open and Closed
 
-```text
+```c
 fsp_err_t rs_servo_SweepRangeOnce(servo_ctrl_t *p_servo_ctrl, const servo_device_cfg_t *p_motor_cfg)
 ```
 
@@ -417,11 +472,11 @@ Error Returns:
 - FSP_INVALID_POINTER
 
 
-#### rs_servo_Open()
+### 3.3.2 rs_servo_Open()
 Advanced-level function to open an instance of **rs_servo**.<br>
 Valid Module State: Closed
 
-```text
+```c
 fsp_err_t rs_servo_Open(servo_ctrl_t *p_servo_ctrl, const servo_device_cfg_t *p_motor_cfg);
 ```
 rs_servo_Open initializes the servo control instance and starts PWM output at the minimum configured servo angle.
@@ -439,20 +494,20 @@ This function performs the following operations:
 9. Starts the timer.
 10. Marks the servo instance as open.
 
-#### rs_servo_Close()
+### 3.3.3 rs_servo_Close()
 Advanced-level function to close an instance of **rs_servo**.<br>
 Valid Module State: Closed
 
-```text
+```c
 fsp_err_t rs_servo_Close(servo_ctrl_t *p_servo_ctrl);
 ```
 Closes the GPT timer instance used by the servo control layer and marks the servo control instance as closed. This function validates that the servo control pointer is not NULL and that the servo instance is currently open before closing the timer.
 
-#### rs_servo_WriteAngle()
+### 3.3.4 rs_servo_WriteAngle()
 Advanced-level function to move the servo to the specified angle.<br>
 Valid Module State: Open
 
-```text
+```c
 fsp_err_t rs_servo_WriteAngle(servo_ctrl_t *p_servo_ctrl, int16_t angle);
 ```
 Moves the servo to a requested angle within the configured servo range.
@@ -460,12 +515,12 @@ Moves the servo to a requested angle within the configured servo range.
 The function first checks that the servo instance is open and that the requested angle is between the configured minimum and maximum angles. It then normalizes the angle relative to the configured minimum angle and maps it into the configured duty-cycle count range.
 
 The new duty-cycle count *pulse_counts* is calculated using the relationship:
-```text
+```c
 pulse_counts = min_duty_counts +
                ((adjusted_angle * duty_range_counts) / angle_range_counts);
 ```
 where:
-```text
+```c
 angle_range_counts = maximum_angle - minimum_angle;
 duty_range_counts  = max_duty_counts - min_duty_counts;
 adjusted_angle     = angle - minimum_angle;
@@ -475,7 +530,7 @@ If the servo direction is configured as SERVO_DIRECTION_COUNTERCLOCKWISE, the ad
 
 After the pulse count is calculated, the function verifies that the resulting duty-cycle value is less than the configured PWM period count, then updates the GPT output duty cycle using the FSP timer API.
 
-#### rs_servo_WritePercent()
+### 3.3.5 rs_servo_WritePercent()
 Advanced-level function to move the servo to the specified angle.<br>
 Valid Module State: Open
 
@@ -499,35 +554,51 @@ If the servo direction is configured as SERVO_DIRECTION_COUNTERCLOCKWISE, the ad
 
 This function is useful when the application needs a normalized 0–100 position command instead of an angle-based command.
 
-#### Internal Functions
+### 3.3.6 Internal Functions
 The following helper functions are declared in the rs_servo_functions.h in the current implementation, but they are only used internally by the servo function rs_servo_Open(). 
 
-```text
-fsp_err_t rs_servo_config_gen(servo_ctrl_t *p_servo_ctrl,
-                              const timer_instance_t *p_timer_pwm);
+**Config Gen Function**
+```c
+fsp_err_t rs_servo_config_gen(servo_ctrl_t *p_servo_ctrl, const timer_instance_t *p_timer_pwm);
 ```
 
 The rs_servo_config_gen() copies the FSP GPT timer instance configuration in flash into the servo control structure. This allows the servo layer to maintain a RAM copy of the timer control block, timer configuration, and GPT extended configuration.
 
 The function also rebuilds the public timer wrapper by assigning the local control block, local configuration, and timer API pointer.
 
-```text
+**Config Check Function**
+```c
+fsp_err_t rs_servo_config_gen(const servo_ctrl_t *p_servo_ctrl)
+```
+
+The rs_servo_config_check() is called after the rs_config_gen() returns succesfully and the servo device configuration has been copied into the servo control structure. 
+
+This function checks whether the following statements are true, and returns an error if not:
+- the servo control has a valid pointer to a servo device configuration struct
+- the following servo device configurations are within proper bounds:
+    - Minimum angle is greater than or equal to -180
+    - Maximum angle is less than or equal to 360
+    - Direction is a valid servo_direction_t
+- the public timer wrapper in the servo control properly encapsulates the ctrl, cfg and extended cfg from the servo control struct
+
+**Calculate One-Time Values Function**
+```c
 fsp_err_t rs_servo_calculate_onetime_values(servo_ctrl_t *p_servo_ctrl);
 ```
 The rs_servo_calculate_onetime_values retrieves the GPT timer information and calculates helper values for the servo control block. The precalculated values (period_counts, min_duty_counts and max_duty_counts) are used by subsequent calls to rs_servo_WriteAngle() and rs_servo_WritePercent(). 
 
 The minimum and maximum duty-cycle counts are calculated from the servo pulse-width limits and the timer clock frequency:
-```text
+```c
 min_duty_counts = (minimum_microseconds * timer_clock_frequency) / RS_SERVO_US_PER_SECOND;
 max_duty_counts = (maximum_microseconds * timer_clock_frequency) / RS_SERVO_US_PER_SECOND;
 ```
 
-## Demo Application
+## 3.4 Demo Application
 
 The servo application demo's entry is defined in rs_servo_demo.c. It uses the beginner-level single entry point function rs_servo_SweepRangeOnce() to perform repeated sweeps of the SG90 range. During normal operation, the servo moves through every configured angle from -90 degrees to 90 degrees, then returns to -90 degrees and pauses for one second before the next sweep begins.
 
 The demo application defines an SG90 servo configuration and creates a servo control instance:
-```text
+```c
 const servo_device_cfg_t g_sg90_motor_cfg =
 {
     .minimum_angle = -90,
@@ -541,7 +612,7 @@ servo_ctrl_t g_sg90_servo_ctrl = {0};
 ```
 
 The demo application layer repeatedly calls rs_servo_SweepRangeOnce().
-```text
+```c
 fsp_err_t servo_demo_entry(void)
 {
     fsp_err_t err = FSP_SUCCESS;
@@ -557,11 +628,7 @@ fsp_err_t servo_demo_entry(void)
 }
 ```
 
-TODO: 
-FOLLOW UP:  Current Approach is to allow the error return back to app layer from SweepOnce. After, call close to stop the GPT. 
-QUESTION: Should I instead move close to inside sweep? And then still return error after closing? If so, update the section rs_servo_SweepRangeOnce
-
-### Using FSP Stack vs Preset Configurations 
+### 3.4.1 Using FSP Stack vs Preset Configurations 
 In the project, the required GPT module settings are saved in flash and at runtime are copied into SRAM for use by the FSP APIs. 
 There are 2 identical flash copies of the required configurations in the project:
 * g_pwm_sg90 
@@ -598,25 +665,25 @@ The rs_servo_config_gen() routine first copies the GPT configuration flash insta
 
 ***
 
-# Running the Demo Application
+# 4. Running the Demo Application
 
 The example application titled "Servo_Motor_FPB_RA2E3" is located in /examples/e2studio. 
 
-## Required Resources
+## 4.1 Required Resources
 To build and run the project, the following resources are needed:
 
-### Hardware
+### 4.1.1 Hardware
 * Renesas RA MCU FPB-RA2E3 
 * USB Debug Cable
 * SG90 Servo Motor
 * Jumper Wires to connect SG90 to FPB-RA2E3
 
-### Software
+### 4.1.2 Software
 * e² studio v2026-04.2
 * FSP v6.5.1
 * LLVM for ARM v21.1.1
 
-## Steps to Run
+## 4.2 Steps to Run
 1. Connect the SG90 to the FPB-RA2E3.
     * (+) SG90 goes to (5V) MCU
     * (-) SG90 goes to (GND) MCU
@@ -631,7 +698,7 @@ To build and run the project, the following resources are needed:
 
 ***
 
-# Limitations
+# 5. Limitations
 The current implementation has the following limitations:
 
 - The public function layer currently supports GPT timer peripherals only.
@@ -645,17 +712,17 @@ The current implementation has the following limitations:
 
 ***
  
-# Integration / Reusability
+# 6. Integration / Reusability
 
 The public function layer was designed to be reusable both within the supplied demonstration application and within custom applications.
 
 By modifying the timer configuration and servo configuration structures, the same public functions can be used with different servo motors, PWM output pins, and application-specific control logic.
 
-## Inside the Demo Application
+## 6.1 Inside the Demo Application
 
 The demonstration project can be modified to evaluate different timer configurations and servo motors.
 
-### Demo Application Using FSP Configuration
+### 6.1.1 Demo Application Using FSP Configuration
 
 The demo project can use either the provided preset configuration or the project's generated FSP configuration.
 
@@ -669,7 +736,7 @@ The demo project can use either the provided preset configuration or the project
 
 > ℹ the GPT configuration matches the SG90 pulse. If using the same motor, it is only recommended to attempt changing the GPT output pin. 
 
-### Demo Application Using a Different Servo Motor
+### 6.1.2 Demo Application Using a Different Servo Motor
 
 To evaluate a different servo motor:
 
@@ -685,17 +752,17 @@ To evaluate a different servo motor:
 - [ ] Rebuild and download the project.
 - [ ] Validate operation across the servo's full range of motion.
 
-## Inside a Custom Application
+## 6.2 Inside a Custom Application
 
 The public function layer can be reused within a custom application by following the checklist below.
 
-### Public Function Layer
+### 6.2.1 Public Function Layer
 
 - [ ] Copy `rs_servo_functions.c` into the project's source directory.
 - [ ] Copy `rs_servo_functions.h` into the project's source directory.
 - [ ] Include `rs_servo_functions.h` in the source file that will call the public functions.
 
-### GPT Timer Configuration
+### 6.2.2 GPT Timer Configuration
 
 Add a GPT timer peripheral in the FSP Configuration editor and configure the PWM settings required by the target servo motor.
 
@@ -709,7 +776,7 @@ Add a GPT timer peripheral in the FSP Configuration editor and configure the PWM
 - [ ] Set `USE_PRESET_CONFIG` appropriately to use either the preset configuration or the timer instance generated by `configuration.xml`.
 - [ ] If required, modify `rs_servo_Open()` so that `rs_servo_config_gen()` references the desired GPT instance.
 
-### Public Data Configuration
+### 6.2.3 Public Data Configuration
 
 The application must define:
 
@@ -723,7 +790,7 @@ The implementation in `rs_servo_demo.c` can be used as a reference.
 - [ ] Verify the configured angle range matches the servo datasheet.
 - [ ] Verify the configured minimum and maximum pulse widths match the servo datasheet.
 
-### Servo Initialization
+### 6.2.4 Servo Initialization
 
 The following function must be called before any position update:
 
@@ -734,7 +801,7 @@ rs_servo_Open(&g_servo_ctrl, &g_servo_cfg);
 - [ ] Call rs_servo_Open() before calling any write function.
 - [ ] Verify the function returns FSP_SUCCESS.
 
-### Servo Position Update
+### 6.2.5 Servo Position Update
 After opening the servo instance, the application can control the servo using:
 
 ```c
@@ -750,7 +817,7 @@ rs_servo_WritePercent(&g_servo_ctrl, percent);
 - [ ] Use rs_servo_WritePercent() for percentage-based positioning.
 - [ ] Optionally review rs_servo_SweepRangeOnce() as a reference implementation.
 
-### Servo Shut-down
+### 6.2.6 Servo Shut-down
 When servo control is no longer required, use:
 
 ```c
@@ -758,7 +825,7 @@ rs_servo_Close(&g_servo_ctrl);
 ```
 - [ ] Call rs_servo_Close() to release GPT resources.
 
-### Drive Multiple Servo Motors
+### 6.2.7 Drive Multiple Servo Motors
 For each additional servo motor:
 
 - [ ] Allocate a dedicated GPT timer instance & channel.

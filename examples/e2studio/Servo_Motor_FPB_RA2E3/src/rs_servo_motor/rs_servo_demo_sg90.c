@@ -22,6 +22,7 @@ fsp_err_t servo_demo_entry(void)
         err = rs_servo_SweepRangeOnce(&g_sg90_servo_ctrl, &g_sg90_motor_cfg );
     }
 
+    /* Close the servo control instance and timer hardware if an error occurs. */
     err = rs_servo_Close(&g_sg90_servo_ctrl);
 
     return err;

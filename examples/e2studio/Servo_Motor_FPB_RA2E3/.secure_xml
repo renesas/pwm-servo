@@ -40,7 +40,7 @@
       <configSetting altId="adc0.an007.p012" configurationId="adc0.an007" peripheral="ADC0"/>
       <configSetting altId="adc0.an008.p013" configurationId="adc0.an008" peripheral="ADC0"/>
       <configSetting altId="adc0.an009.p014" configurationId="adc0.an009" peripheral="ADC0"/>
-      <configSetting altId="gpt0.gtioc0b.p212" configurationId="gpt0.gtioc0b" isUsedByDriver="true" peripheral="GPT0"/>
+      <configSetting altId="gpt0.gtioc0b.p212" configurationId="gpt0.gtioc0b" peripheral="GPT0"/>
       <configSetting altId="icu.irq7.p015" configurationId="icu.irq7" peripheral="ICU"/>
       <configSetting altId="icu.nmi.p200" configurationId="icu.nmi" peripheral="ICU"/>
       <configSetting altId="iic0.scl0.p400" configurationId="iic0.scl0" peripheral="IIC0"/>

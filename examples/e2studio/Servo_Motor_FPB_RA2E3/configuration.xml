@@ -188,7 +188,7 @@
       <property id="module.driver.ioport.elc_trigger_ioport4" value="_disabled"/>
       <property id="module.driver.ioport.pincfg" value="g_bsp_pin_cfg"/>
     </module>
-    <module id="module.driver.timer_on_gpt.301200674">
+    <module id="module.driver.timer_on_gpt.1857806458">
       <property id="module.driver.timer.name" value="g_pwm_sg90"/>
       <property id="module.driver.timer.channel" value="0"/>
       <property id="module.driver.timer.mode" value="module.driver.timer.mode.mode_pwm"/>
@@ -256,7 +256,7 @@
     </module>
     <context id="_hal.0">
       <stack module="module.driver.ioport_on_ioport.0"/>
-      <stack module="module.driver.timer_on_gpt.301200674"/>
+      <stack module="module.driver.timer_on_gpt.1857806458"/>
     </context>
     <config id="config.driver.gpt">
       <property id="config.driver.gpt.param_checking_enable" value="config.driver.gpt.param_checking_enable.bsp"/>

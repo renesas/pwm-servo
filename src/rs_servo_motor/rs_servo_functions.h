@@ -50,10 +50,11 @@ typedef struct st_servo_ctrl
 /* Public Functions */
 fsp_err_t rs_servo_SweepRangeOnce(servo_ctrl_t *p_servo_ctrl, const servo_device_cfg_t *p_motor_cfg);
 fsp_err_t rs_servo_Open(servo_ctrl_t *p_servo_ctrl, const servo_device_cfg_t *p_motor_cfg);
-fsp_err_t rs_servo_config_gen(servo_ctrl_t *p_servo_ctrl, const timer_instance_t * p_timer_pwm);
-fsp_err_t rs_servo_calculate_onetime_values(servo_ctrl_t *p_servo_ctrl);
 fsp_err_t rs_servo_WriteAngle(servo_ctrl_t *p_servo_ctrl, int16_t angle);
 fsp_err_t rs_servo_WritePercent(servo_ctrl_t * p_servo_ctrl, uint8_t percent);
 fsp_err_t rs_servo_Close(servo_ctrl_t *p_servo_ctrl);
+fsp_err_t rs_servo_config_gen(servo_ctrl_t *p_servo_ctrl, const timer_instance_t * p_timer_pwm);
+fsp_err_t rs_servo_config_check(const servo_ctrl_t * p_servo_ctrl);
+fsp_err_t rs_servo_calculate_onetime_values(servo_ctrl_t *p_servo_ctrl);
 
 #endif /* SERVO_MOTOR_SERVO_H_ */
