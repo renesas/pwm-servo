@@ -1,5 +1,10 @@
+/***********************************************************************************************************************
+* Copyright (c) 2020 - 2026 Renesas Electronics Corporation and/or its affiliates
+*
+* SPDX-License-Identifier: BSD-3-Clause
+***********************************************************************************************************************/
 /* Motor configuration info from the SG90 datasheet. */
-#include "rs_servo_functions.h"
+#include <rs_servo.h>
 
 const servo_device_cfg_t g_sg90_motor_cfg =
 {

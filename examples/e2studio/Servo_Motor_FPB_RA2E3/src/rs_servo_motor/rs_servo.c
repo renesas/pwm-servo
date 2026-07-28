@@ -1,8 +1,13 @@
 
+/***********************************************************************************************************************
+* Copyright (c) 2020 - 2026 Renesas Electronics Corporation and/or its affiliates
+*
+* SPDX-License-Identifier: BSD-3-Clause
+***********************************************************************************************************************/
 #if USE_PRESET_CONFIG
-#include <rs_servo_motor/rs_servo_config_fpb_ra2e3_sg90.h>
+#include <rs_servo_config_fpb_ra2e3_sg90.h>
 #endif
-#include <rs_servo_functions.h>
+#include <rs_servo.h>
 
 #define RS_SERVO_DELAY_100MS     (100)
 #define RS_SERVO_DELAY_1S        (1000)

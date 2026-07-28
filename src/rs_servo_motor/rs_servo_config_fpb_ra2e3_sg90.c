@@ -1,7 +1,12 @@
+/***********************************************************************************************************************
+* Copyright (c) 2020 - 2026 Renesas Electronics Corporation and/or its affiliates
+*
+* SPDX-License-Identifier: BSD-3-Clause
+***********************************************************************************************************************/
 /* Pre-set configuration source file - do not edit */
 
 #if USE_PRESET_CONFIG  //Use pre-set configuration for SG90 Servo Motor
-#include <rs_servo_motor/rs_servo_config_fpb_ra2e3_sg90.h>
+#include <rs_servo_config_fpb_ra2e3_sg90.h>
 
 gpt_instance_ctrl_t g_pwm_sg90_ctrl_preset;
 

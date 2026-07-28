@@ -1,3 +1,8 @@
+/***********************************************************************************************************************
+* Copyright (c) 2020 - 2026 Renesas Electronics Corporation and/or its affiliates
+*
+* SPDX-License-Identifier: BSD-3-Clause
+***********************************************************************************************************************/
 /* Pre-set configuration header file - do not edit */
 #if USE_PRESET_CONFIG  //Use pre-set configuration for SG90 Servo Motor
 #ifndef SERVO_MOTOR_CONFIG_SG90_FPB_RA2E3_H_
