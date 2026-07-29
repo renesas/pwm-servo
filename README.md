@@ -2,7 +2,7 @@
 
 This repository is a collection of reusable software made available for development with Renesas Microcontrollers.
 
-To make your reusable software component visible in this repository see section below on [Contributions](#-Contributions).
+To make your reusable software component visible in this repository see section below on [Contributions](README.md#-Contributions).
 
 
 # Resources & Support
