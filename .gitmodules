@@ -1,3 +1,6 @@
 [submodule "servo-rc"]
 	path = servo-rc
 	url = git@gitlab.global.renesas.com:mcusys/pes-rc-hobby-servo-motor.git
+[submodule "smooth-lighting-controller"]
+	path = smooth-lighting-controller
+	url = git@gitlab.global.renesas.com:mcusys/rs-smooth-lighting-controller.git
