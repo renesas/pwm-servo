@@ -7,3 +7,6 @@
 [submodule "rtc-event-logger"]
 	path = rtc-event-logger
 	url = git@gitlab.global.renesas.com:mcusys/pes-rtc-event-logger.git
+[submodule "mqtt-da16600"]
+	path = mqtt-da16600
+	url = git@gitlab.global.renesas.com:mcusys/pes-mqtt-da16600.git
