@@ -4,3 +4,6 @@
 [submodule "smooth-lighting-controller"]
 	path = smooth-lighting-controller
 	url = git@gitlab.global.renesas.com:mcusys/rs-smooth-lighting-controller.git
+[submodule "rtc-event-logger"]
+	path = rtc-event-logger
+	url = git@gitlab.global.renesas.com:mcusys/pes-rtc-event-logger.git
