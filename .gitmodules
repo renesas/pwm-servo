@@ -1,0 +1,3 @@
+[submodule "servo-rc"]
+	path = servo-rc
+	url = git@gitlab.global.renesas.com:mcusys/pes-rc-hobby-servo-motor.git
