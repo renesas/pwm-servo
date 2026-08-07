@@ -248,7 +248,9 @@ fsp_err_t rs_servo_config_check(const servo_ctrl_t * p_servo_ctrl)
 
     /* Check that the servo device configurations are acceptable. */
     FSP_ERROR_RETURN(p_servo_ctrl->p_device->minimum_angle >= RS_SERVO_MIN_ANGLE_CFG, FSP_ERR_INVALID_MODE);
-    FSP_ERROR_RETURN(p_servo_ctrl->p_device->maximum_angle <= RS_SERVO_MAX_ANGLE_CFG, FSP_ERR_INVALID_MODE)
+    FSP_ERROR_RETURN(p_servo_ctrl->p_device->maximum_angle <= RS_SERVO_MAX_ANGLE_CFG, FSP_ERR_INVALID_MODE);
+    FSP_ERROR_RETURN(p_servo_ctrl->p_device->maximum_angle > p_servo_ctrl->p_device->minimum_angle, FSP_ERR_INVALID_MODE);
+    FSP_ERROR_RETURN(p_servo_ctrl->p_device->maximum_microseconds > p_servo_ctrl->p_device->minimum_microseconds, FSP_ERR_INVALID_MODE);
     FSP_ERROR_RETURN( (p_servo_ctrl->p_device->direction == SERVO_DIRECTION_CLOCKWISE) || (p_servo_ctrl->p_device->direction == SERVO_DIRECTION_COUNTERCLOCKWISE),  FSP_ERR_INVALID_MODE);
 
     /* Ensure the public timer wrapper encapsulates the ctrl, cfg, and extended cfg. */

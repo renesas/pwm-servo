@@ -691,7 +691,8 @@ To build and run the project, the following resources are needed:
 2. Connect the FPB-RA2E3 to the host PC with the USB debug cable.
 3. Download the demonstration application in the repo's /examples/e2studio to your host PC.
 4. Open e2studio and navigate to File > Import > General > Existing Projects and select the location of the e2studio folder to import the project **Servo_Motor_FPB_RA2E3**. 
-5. Press Build to generate the system configuration files and the application's binary.
+5. From the workspace, open the file **configuration.xml**. Then click the Generate Project Contents button to generate the system configuration files.
+5. Press Build to generate the application's binary.
 6. Press Debug to load the binary to the FPB-RA2E3. 
 7. Press Run twice to run with the debugger, or press the reset switch on the MCU to run outside the debugger. 
 8. Observe the SG90 servo repeatedly sweep through its range.
