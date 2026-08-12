@@ -53,13 +53,13 @@ The repository is organized into major areas:
         - 3.3.4 [rs_servo_WriteAngle()](#334-rs_servo_writeangle)
         - 3.3.5 [rs_servo_WritePercent()](#335-rs_servo_writepercent)
         - 3.3.6 [Internal Functions](#336-internal-functions)
-    - 3.4 [Demo Application](#34-demo-application)
-        - 3.4.1 [Using FSP Stack vs Preset Configurations](#341-using-fsp-stack-vs-preset-configurations)
+    - 3.4 [Demo Application Layer](#34-demo-application-layer)
 4. [Running the Demo Application](#4-running-the-demo-application)
     - 4.1 [Required Resources](#41-required-resources)
         - 4.1.1 [Hardware](#411-hardware)
         - 4.1.2 [Software](#412-software)
-    - 4.2 [Steps to Run](#42-steps-to-run)
+        - 4.1.3 [Connect the FPB-RA2E3 to SG90](#413-connect-the-fpb-ra2e3-to-sg90)
+    - 4.2 [Using FSP Stack vs Preset Configurations](#42-using-fsp-stack-vs-preset-configurations)
 5. [Limitations](#5-limitations)
 6. [Integration / Reusability](#6-integration--reusability)
     - 6.1 [Inside the Demo Application](#61-inside-the-demo-application)
@@ -593,7 +593,7 @@ min_duty_counts = (minimum_microseconds * timer_clock_frequency) / RS_SERVO_US_P
 max_duty_counts = (maximum_microseconds * timer_clock_frequency) / RS_SERVO_US_PER_SECOND;
 ```
 
-## 3.4 Demo Application
+## 3.4 Demo Application Layer
 
 The servo application demo's entry is defined in rs_servo_demo.c. It uses the beginner-level single entry point function rs_servo_SweepRangeOnce() to perform repeated sweeps of the SG90 range. During normal operation, the servo moves through every configured angle from -90 degrees to 90 degrees, then returns to -90 degrees and pauses for one second before the next sweep begins.
 
@@ -628,7 +628,35 @@ fsp_err_t servo_demo_entry(void)
 }
 ```
 
-### 3.4.1 Using FSP Stack vs Preset Configurations 
+***
+
+# 4. Running the Demo Application
+
+The example application titled "Servo_Motor_FPB_RA2E3" is located in /examples/e2studio. 
+
+## 4.1 Required Resources
+To build and run the project, the following resources are needed:
+
+### 4.1.1 Hardware
+* Renesas RA MCU FPB-RA2E3 
+* USB Debug Cable
+* SG90 Servo Motor
+* Jumper Wires to connect SG90 to FPB-RA2E3
+
+### 4.1.2 Software
+* e² studio v2026-04.2
+* VS Code with Renesas Platform Extension
+* FSP v6.5.0
+* LLVM for ARM v21.1.1
+
+### 4.1.3 Connect the FPB-RA2E3 to SG90
+Connect the SG90 to the FPB-RA2E3:
+
+    * (+) SG90 goes to (5V) MCU
+    * (-) SG90 goes to (GND) MCU
+    * (PWM) SG90 goes to (P212) MCU
+
+## 4.2 Using FSP Stack vs Preset Configurations 
 In the project, the required GPT module settings are saved in flash and at runtime are copied into SRAM for use by the FSP APIs. 
 There are 2 identical flash copies of the required configurations in the project:
 * g_pwm_sg90 
@@ -661,41 +689,6 @@ The SRAM copy is stored as multiple members of the servo control block *servo_ct
 The rs_servo_config_gen() routine first copies the GPT configuration flash instances into the servo control block, then it wraps them all in the public timer instance:
 
 <img src="images/config_gen_copy.png" alt="The Internal Routine Automatically Copies Flash Configurations into SRAM" width="800"/><br>
-
-
-***
-
-# 4. Running the Demo Application
-
-The example application titled "Servo_Motor_FPB_RA2E3" is located in /examples/e2studio. 
-
-## 4.1 Required Resources
-To build and run the project, the following resources are needed:
-
-### 4.1.1 Hardware
-* Renesas RA MCU FPB-RA2E3 
-* USB Debug Cable
-* SG90 Servo Motor
-* Jumper Wires to connect SG90 to FPB-RA2E3
-
-### 4.1.2 Software
-* e² studio v2026-04.2
-* FSP v6.5.1
-* LLVM for ARM v21.1.1
-
-## 4.2 Steps to Run
-1. Connect the SG90 to the FPB-RA2E3.
-    * (+) SG90 goes to (5V) MCU
-    * (-) SG90 goes to (GND) MCU
-    * (PWM) SG90 goes to (P212) MCU
-2. Connect the FPB-RA2E3 to the host PC with the USB debug cable.
-3. Download the demonstration application in the repo's /examples/e2studio to your host PC.
-4. Open e2studio and navigate to File > Import > General > Existing Projects and select the location of the e2studio folder to import the project **Servo_Motor_FPB_RA2E3**. 
-5. From the workspace, open the file **configuration.xml**. Then click the Generate Project Contents button to generate the system configuration files.
-5. Press Build to generate the application's binary.
-6. Press Debug to load the binary to the FPB-RA2E3. 
-7. Press Run twice to run with the debugger, or press the reset switch on the MCU to run outside the debugger. 
-8. Observe the SG90 servo repeatedly sweep through its range.
 
 ***
 
