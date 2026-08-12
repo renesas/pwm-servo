@@ -16,3 +16,6 @@
 [submodule "stdio-llvm"]
 	path = stdio-llvm
 	url = git@gitlab.global.renesas.com:mcusys/pes-console-io.git
+[submodule "adc"]
+	path = adc
+	url = git@gitlab.global.renesas.com:mcusys/pes-adc.git
