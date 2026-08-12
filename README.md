@@ -18,8 +18,9 @@ To make your reusable software component visible in this repository see section 
 
 | Document | Description |
 |---|---|
+| [Renesas VS Code Extensions User Guide](https://tool-support.renesas.com/e2studio/vscode/docs/index.html) | User Guide to support the development of Renesas C/C++ Projects in DA, RA, R-Car, RH850, RISC-V MCU, RL78, RX, RZ device families. |
 | [e² studio Renesas](https://www.renesas.com/en/software-tool/e2-studio?srsltid=AfmBOorTMc82ySC1OUrEN8SZbrQK2qXPYpFT_VatUYLmZMBeViM4bFTS) | e² studio user guide and tool page |
-| [Renesas FSP Documentation](https://renesas.github.io/fsp/) | FSP API reference for all modules used |
+| [Renesas RA FSP Documentation](https://renesas.github.io/fsp/) | FSP API reference for all modules used |
 
 
 # Contributions
