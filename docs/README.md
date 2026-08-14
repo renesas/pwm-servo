@@ -230,7 +230,7 @@ The SG90 is a 180° clockwise-rotating servo with the following PWM pulse parame
 * Maximum pulse (represents 90°) = 2 ms
 * PWM period = 20ms
 
-<img src="images/sg90_pulse.png" alt="SG90 Pulse Waveform" width="400"/><br>
+<img src="images/sg90_pulse.png" alt="SG90 Pulse Waveform has a varying 1-2ms duty cycle and a 20ms period (50Hz)" width="400"/><br>
 
 
 Calculate the Servo PWM Resolution: <br>
@@ -303,7 +303,7 @@ The following non-default FSP properties enable the R_GPT to control the SG90 se
 ### 2.2.2 Pin Configurations 
 The following pin configurations used in the project route the GPT PWM signal to output pin P212 on GTIOCB. 
 
-<img src="images/pin_config.png" alt="The Demo's GPT Pin Settings" width="450"/><br>
+<img src="images/pin_config.png" alt="FSP Pin Config for GPT0: Pin Group is Mixed, Operation Mode is GTIOCA or GTIOCB, and IO route GTIOC0B to P212" width="450"/><br>
 
 ***
 
@@ -670,17 +670,17 @@ For guaranteed demo operation, do not edit these files or overwrite the project'
  
 The following image shows the files containing the flash configuration copies in the project's workspace. The FSP configuration files with flash instance **g_pwm_sg90** are highlighted in orange and those with flash instance **g_pwm_sg90_preset** are highlighted in green.
 
-<img src="images/flash_configs.png" alt="The Flash Copies of the GPT Configurations" width="800"/><br>
+<img src="images/flash_configs.png" alt="Instance g_pwm_sg90 is defined in ra_gen/hal_data.c and .h and instance g_pwm_preset is defined in src/rs_servo_motor/rs_servo_config_fpb_ra2e3_sg90.c and .h" width="800"/><br>
 
 The macro USE_PRESET_CONFIG is defined in the Project Properties > C/C++ Build settings. It determines which flash configuration will be copied into SRAM at runtime. Its value can be set using the project property shown below:
 
-<img src="images/use_preset_config_macro.png" alt="USE_PRESET_CONFIG Macro Defined in the Project's Properties" width="500"/><br>
+<img src="images/use_preset_config_macro.png" alt="Project macros are in the Project Settings > C/C++ Build > Settings > Tool Settings tab > Compiler > Includes > Macro Defines section" width="500"/><br>
 
 The rs_servo_Open() routine automatically calls the internal routine rs_servo_config_gen() with the GPT instance that corresponds to the value of USE_PRESET_CONFIG.
 * USE_PRESET_CONFIG = 1 selects **g_pwm_sg90_preset**
 * USE_PRESET_CONFIG = 0 selects **g_pwm_sg90**
 
-<img src="images/config_gen_in_open.png" alt="USE_PRESET_CONFIG Determines the GPT Configuration Used" width="800"/><br>
+<img src="images/config_gen_in_open.png" alt="USE_PRESET_CONFIG Determines the GPT Configuration Instance Used" width="800"/><br>
 
 The SRAM copy is stored as multiple members of the servo control block *servo_ctrl_t* and are highlighted in blue below. The configurations are additionally wrapped up by a public timer instance in SRAM highlighted in purple.
 
@@ -688,7 +688,7 @@ The SRAM copy is stored as multiple members of the servo control block *servo_ct
 
 The rs_servo_config_gen() routine first copies the GPT configuration flash instances into the servo control block, then it wraps them all in the public timer instance:
 
-<img src="images/config_gen_copy.png" alt="The Internal Routine Automatically Copies Flash Configurations into SRAM" width="800"/><br>
+<img src="images/config_gen_copy.png" alt="The Internal Routine ConfigbGen Automatically Copies Flash Configurations into SRAM" width="800"/><br>
 
 ***
 
