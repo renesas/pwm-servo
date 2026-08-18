@@ -12,6 +12,7 @@
 #define RS_SERVO_DELAY_100MS     (100)
 #define RS_SERVO_DELAY_1S        (1000)
 #define RS_SERVO_US_PER_SECOND   (1000000ULL)
+#define RS_SERVO_MIN_PERCENTAGE  (0U)
 #define RS_SERVO_MAX_PERCENTAGE  (100U)
 #define RS_SERVO_MAX_ANGLE_CFG   (360)
 #define RS_SERVO_MIN_ANGLE_CFG   (-180)
@@ -143,7 +144,7 @@ fsp_err_t rs_servo_WriteAngle(servo_ctrl_t *p_servo_ctrl, int16_t angle)
     /* Normalize angle minimum to 0. */
     uint32_t adjusted_angle = (uint32_t) (angle - min_angle);
 
-    if (SERVO_DIRECTION_COUNTERCLOCKWISE == p_servo_ctrl->p_device->direction)
+    if (SERVO_DIRECTION_REVERSE == p_servo_ctrl->p_device->direction)
     {
         adjusted_angle = angle_range_counts - adjusted_angle;
     }
@@ -169,13 +170,14 @@ fsp_err_t rs_servo_WritePercent(servo_ctrl_t * p_servo_ctrl, uint8_t percent)
 
     /* Step must be 0–100 */
     FSP_ERROR_RETURN(percent <= RS_SERVO_MAX_PERCENTAGE, FSP_ERR_INVALID_ARGUMENT);
+    FSP_ERROR_RETURN(percent >= RS_SERVO_MIN_PERCENTAGE, FSP_ERR_INVALID_ARGUMENT);
 
     uint32_t duty_range_counts  = p_servo_ctrl->max_duty_counts - p_servo_ctrl->min_duty_counts;
 
     /* Consider direction step */
     uint32_t adjusted_percent = (uint32_t) percent;
 
-    if (SERVO_DIRECTION_COUNTERCLOCKWISE == p_servo_ctrl->p_device->direction)
+    if (SERVO_DIRECTION_REVERSE == p_servo_ctrl->p_device->direction)
     {
         adjusted_percent = RS_SERVO_MAX_PERCENTAGE - adjusted_percent;
     }
@@ -251,7 +253,7 @@ fsp_err_t rs_servo_config_check(const servo_ctrl_t * p_servo_ctrl)
     FSP_ERROR_RETURN(p_servo_ctrl->p_device->maximum_angle <= RS_SERVO_MAX_ANGLE_CFG, FSP_ERR_INVALID_MODE);
     FSP_ERROR_RETURN(p_servo_ctrl->p_device->maximum_angle > p_servo_ctrl->p_device->minimum_angle, FSP_ERR_INVALID_MODE);
     FSP_ERROR_RETURN(p_servo_ctrl->p_device->maximum_microseconds > p_servo_ctrl->p_device->minimum_microseconds, FSP_ERR_INVALID_MODE);
-    FSP_ERROR_RETURN( (p_servo_ctrl->p_device->direction == SERVO_DIRECTION_CLOCKWISE) || (p_servo_ctrl->p_device->direction == SERVO_DIRECTION_COUNTERCLOCKWISE),  FSP_ERR_INVALID_MODE);
+    FSP_ERROR_RETURN( (p_servo_ctrl->p_device->direction == SERVO_DIRECTION_DEFAULT) || (p_servo_ctrl->p_device->direction == SERVO_DIRECTION_REVERSE),  FSP_ERR_INVALID_MODE);
 
     /* Ensure the public timer wrapper encapsulates the ctrl, cfg, and extended cfg. */
     FSP_ERROR_RETURN(p_servo_ctrl->timer.p_ctrl == &p_servo_ctrl->timer_ctrl, FSP_ERR_INVALID_POINTER);

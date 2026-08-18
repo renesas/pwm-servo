@@ -27,7 +27,6 @@ void hal_entry(void)
         err = servo_demo_entry();
     }
 
-
     /* Wake up 2nd core if this is first core and we are inside a multicore project. */
 #if (0 == _RA_CORE) && (1 == BSP_MULTICORE_PROJECT) && !BSP_TZ_NONSECURE_BUILD
 
@@ -56,6 +55,8 @@ void hal_entry(void)
     /* Enter non-secure code */
     R_BSP_NonSecureEnter();
 #endif
+
+    while(1);
 }
 
 #if BSP_TZ_SECURE_BUILD

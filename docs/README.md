@@ -60,6 +60,7 @@ The repository is organized into major areas:
         - 4.1.2 [Software](#412-software)
         - 4.1.3 [Connect the FPB-RA2E3 to SG90](#413-connect-the-fpb-ra2e3-to-sg90)
     - 4.2 [Using FSP Stack vs Preset Configurations](#42-using-fsp-stack-vs-preset-configurations)
+    - 4.3 [Note on SG90 Angle Response](#43-note-on-sg90-angle-response)
 5. [Limitations](#5-limitations)
 6. [Integration / Reusability](#6-integration--reusability)
     - 6.1 [Inside the Demo Application](#61-inside-the-demo-application)
@@ -225,7 +226,7 @@ The demo application runs on the following hardware:
 ### 2.1.1 FPB-RA2E3 Timer Selection
 This section follows the analysis outlined in the Servo Motor Control Theory subsection Choosing the Right FSP Timer Peripheral.
 
-The SG90 is a 180° clockwise-rotating servo with the following PWM pulse parameters
+The SG90 is a 180° counter-clockwise rotating servo with the following PWM pulse parameters
 * Minimum pulse (represents -90°) = 1 ms
 * Maximum pulse (represents 90°) = 2 ms
 * PWM period = 20ms
@@ -335,12 +336,14 @@ The following macros are defined in the rs_servo_functions.c file and support th
 | RS_SERVO_DELAY_100MS | 100 | Used for a 100ms delay between incrementing angle calls in the sweep function. |
 | RS_SERVO_DELAY_1S | 1000 | Used for a 1s (1000ms) delay when the sweep function moves from the max angle back to the min. |
 | RS_SERVO_DELAY_US_PER_SECOND | 1000000ULL | The number of microseconds in a second. Used in the servo position update functions to calculate the new duty cycle count. |
+| RS_SERVO_MIN_PERCENTAGE | 0 | Minimum percent. Used in the write percent function to ensure valid input. | 
 | RS_SERVO_MAX_PERCENTAGE | 100 | Maximum percent. Used in the write percent function to ensure valid input. |
 
 ```c
 #define RS_SERVO_DELAY_100MS     (100)
 #define RS_SERVO_DELAY_1S        (1000)
 #define RS_SERVO_US_PER_SECOND   (1000000ULL)
+#define RS_SERVO_MIN_PERCENTAGE  (0U)
 #define RS_SERVO_MAX_PERCENTAGE  (100U)
 #define RS_SERVO_MAX_ANGLE_CFG   (360)
 #define RS_SERVO_MIN_ANGLE_CFG   (-180)
@@ -354,8 +357,8 @@ The type *servo_direction_t* provides the directions that can describe the servo
 /* Servo Direction Enum */
 typedef enum e_servo_direction_t
 {
-    SERVO_DIRECTION_CLOCKWISE,
-    SERVO_DIRECTION_COUNTERCLOCKWISE,
+    SERVO_DIRECTION_DEFAULT,
+    SERVO_DIRECTION_REVERSE,
 } servo_direction_t;
 ```
 
@@ -395,7 +398,7 @@ const servo_device_cfg_t g_sg90_motor_cfg =
     .maximum_angle = 90,
     .minimum_microseconds = 1000,
     .maximum_microseconds = 2000,
-    .direction = SERVO_DIRECTION_CLOCKWISE
+    .direction = SERVO_DIRECTION_DEFAULT
 };
 ```
 ### 3.2.4 Servo Control Block
@@ -526,7 +529,7 @@ duty_range_counts  = max_duty_counts - min_duty_counts;
 adjusted_angle     = angle - minimum_angle;
 ```
 
-If the servo direction is configured as SERVO_DIRECTION_COUNTERCLOCKWISE, the adjusted angle is inverted before calculating the duty-cycle count.
+If the servo direction is configured as SERVO_DIRECTION_REVERSE, the adjusted angle is inverted before calculating the duty-cycle count.
 
 After the pulse count is calculated, the function verifies that the resulting duty-cycle value is less than the configured PWM period count, then updates the GPT output duty cycle using the FSP timer API.
 
@@ -550,7 +553,7 @@ The new duty-cycle count *pulse_counts* is calculated using:
 pulse_counts = min_duty_counts +
                ((adjusted_percent * duty_range_counts) / 100);
 ```
-If the servo direction is configured as SERVO_DIRECTION_COUNTERCLOCKWISE, the adjusted percent is inverted before calculating the duty-cycle count.
+If the servo direction is configured as SERVO_DIRECTION_REVERSE, the adjusted percent is inverted before calculating the duty-cycle count.
 
 This function is useful when the application needs a normalized 0–100 position command instead of an angle-based command.
 
@@ -605,7 +608,7 @@ const servo_device_cfg_t g_sg90_motor_cfg =
     .maximum_angle = 90,
     .minimum_microseconds = 1000,
     .maximum_microseconds = 2000,
-    .direction = SERVO_DIRECTION_CLOCKWISE
+    .direction = SERVO_DIRECTION_DEFAULT
 };
 
 servo_ctrl_t g_sg90_servo_ctrl = {0};
@@ -689,6 +692,15 @@ The SRAM copy is stored as multiple members of the servo control block *servo_ct
 The rs_servo_config_gen() routine first copies the GPT configuration flash instances into the servo control block, then it wraps them all in the public timer instance:
 
 <img src="images/config_gen_copy.png" alt="The Internal Routine ConfigbGen Automatically Copies Flash Configurations into SRAM" width="800"/><br>
+
+## 4.3 Note on SG90 Angle Response
+The SG90 datasheet commonly specifies a control pulse width range of 1 ms to 2 ms, corresponding to approximately -90° to +90° (180° total travel). In practice, however, the SG90 is a low-cost hobby servo and its actual mechanical range can vary significantly between units.
+
+Many SG90 servos do not achieve a full 180° sweep when driven with 1 ms and 2 ms pulse widths. Manufacturing tolerances, gear alignment, internal potentiometer calibration, and mechanical end stops often limit the usable travel to less than the advertised range. It is therefore normal to observe total motion less than 180°, sometimes as limited as 90°.
+
+For applications requiring precise angular positioning, the relationship between pulse width and output angle can be characterized experimentally on the target hardware rather than relying solely on the values stated in the datasheet. However, driving beyond the servo's actual mechanical limits can cause increased current consumption, audible buzzing, heat generation, and premature wear.
+
+The risk of experimental maximum and minimum microsecond settings is assumed by the user. 
 
 ***
 

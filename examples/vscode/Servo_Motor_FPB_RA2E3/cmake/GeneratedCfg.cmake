@@ -3,14 +3,14 @@
 
 set(RASC_TARGET_DEVICE R7FA2E307)
 set(RASC_TARGET_ARCH cortex-m23)
-set(RASC_PROJECT_NAME Servo_Motor_FPB_RA2E3)
+set(RASC_PROJECT_NAME Servo_Motor_FPB_RA2E3_cmake)
 SET(RASC_TOOLCHAIN_NAME LLVMARM)
 
 SET(RASC_CMAKE_ASM_FLAGS "--target=arm-none-eabi;-mcpu=cortex-m23;-Wunused;-Wuninitialized;-Wall;-Wextra;-Wmissing-declarations;-Wconversion;-Wpointer-arith;-Wshadow;-Waggregate-return;-Wno-parentheses-equality;-Wfloat-equal;-fshort-enums;-fno-unroll-loops;-fmessage-length=0;-fsigned-char;-ffunction-sections;-fdata-sections;-mthumb;-mlittle-endian;-x;assembler-with-cpp;-MP")
 SET(RASC_CMAKE_C_FLAGS "--target=arm-none-eabi;-mcpu=cortex-m23;-Wunused;-Wuninitialized;-Wall;-Wextra;-Wmissing-declarations;-Wconversion;-Wpointer-arith;-Wshadow;-Waggregate-return;-Wno-parentheses-equality;-Wfloat-equal;-fshort-enums;-fno-unroll-loops;-fmessage-length=0;-fsigned-char;-ffunction-sections;-fdata-sections;-mthumb;-mlittle-endian;-std=c99;-MP;-Oz")
 SET(RASC_CMAKE_CXX_FLAGS "--target=arm-none-eabi;-mcpu=cortex-m23;-Wunused;-Wuninitialized;-Wall;-Wextra;-Wmissing-declarations;-Wconversion;-Wpointer-arith;-Wshadow;-Waggregate-return;-Wno-parentheses-equality;-Wfloat-equal;-fshort-enums;-fno-unroll-loops;-fmessage-length=0;-fsigned-char;-ffunction-sections;-fdata-sections;-mthumb;-mlittle-endian;-std=c++11;-MP;-Oz")
 SET(RASC_CMAKE_EXE_LINKER_FLAGS "--target=arm-none-eabi;-mcpu=cortex-m23;-Wunused;-Wuninitialized;-Wall;-Wextra;-Wmissing-declarations;-Wconversion;-Wpointer-arith;-Wshadow;-Waggregate-return;-Wno-parentheses-equality;-Wfloat-equal;-fshort-enums;-fno-unroll-loops;-fmessage-length=0;-fsigned-char;-ffunction-sections;-fdata-sections;--target=arm-none-eabi;-mthumb;-mlittle-endian;-T;script/fsp.lld;-Wl,-Map=${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.map;-Wl,--gc-sections;-Wl,--cref;-Wl,--icf=none;-o;${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.elf;-Wl,-z,norelro")
-SET(RASC_CMAKE_DEFINITIONS "_RA_ORDINAL=1;_RENESAS_RA_;_RA_CORE=CM23")
+SET(RASC_CMAKE_DEFINITIONS "_RENESAS_RA_;_RA_CORE=CM23;_RA_ORDINAL=1")
 SET(RASC_ASM_FILES "${CMAKE_CURRENT_SOURCE_DIR}/ra_gen/*.asm")
 
 SET(EXCLUDED_SOURCE_FILES )

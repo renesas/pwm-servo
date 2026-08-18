@@ -13,8 +13,8 @@
 /* Servo Direction Enum */
 typedef enum e_servo_direction_t
 {
-    SERVO_DIRECTION_CLOCKWISE,
-    SERVO_DIRECTION_COUNTERCLOCKWISE,
+    SERVO_DIRECTION_DEFAULT,
+    SERVO_DIRECTION_REVERSE,
 } servo_direction_t;
 
 /* Servo Device Configuration */
