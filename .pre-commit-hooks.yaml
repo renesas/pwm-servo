@@ -1,6 +1,0 @@
-- id: meson-fmt
-  name: meson
-  description: ''
-  entry: meson format
-  language: python
-  files: ^(.*/)?(meson\.build|meson\.options)$
