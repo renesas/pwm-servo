@@ -4,28 +4,21 @@ This repository is a collection of reusable software made available for developm
 
 To make your reusable software component visible in this repository see section below on [Contributions](README.md#-Contributions).
 
+## Minumum requirements for reusable software
 
-# Resources & Support
+Each submodule referenced by this repository is a repository with the following contents, at minimum, at the root folder level.
 
-## Feedback & Support
+1. A `src` folder which contains the reusable code.
+2. A `docs` folder which contains documentation explaining what the reusable code does and how to integrate it into your application.
+3. An `examples/vscode` folder which contains vscode + cmake projects which will produce binaries for supported targets.
+4. A `metadata.r365.xml` which describing how above items should be consumed by Renesas365.
 
-- [Renesas Wireless Connectivity Forum](https://community.renesas.com/wireles-connectivity)
-- [Contact Technical Support](https://www.renesas.com/eu/en/support?nid=1564826&issue_type=technical)
-- [Contact a Sales Representative](https://www.renesas.com/eu/en/buy-sample/locations)
-
-
-## Renesas General Reference(s)
-
-| Document | Description |
-|---|---|
-| [Renesas VS Code Extensions User Guide](https://tool-support.renesas.com/e2studio/vscode/docs/index.html) | User Guide to support the development of Renesas C/C++ Projects in DA, RA, R-Car, RH850, RISC-V MCU, RL78, RX, RZ device families. |
-| [e² studio Renesas](https://www.renesas.com/en/software-tool/e2-studio?srsltid=AfmBOorTMc82ySC1OUrEN8SZbrQK2qXPYpFT_VatUYLmZMBeViM4bFTS) | e² studio user guide and tool page |
-| [Renesas RA FSP Documentation](https://renesas.github.io/fsp/) | FSP API reference for all modules used |
+Feel free to clone this repo and initialize some existing submodules for reference.
 
 
 # Contributions
 
-Below are the guidelines for contributing a New Reusable Software Component as a Git Submodule.
+Once you have met the [minimum requirements for reusable software](README.md#minumum-requirements-for-reusable-software), follow the guidelines below to contribute your New Reusable Software Component as a Git Submodule.
 
 ## Prerequisites
 
@@ -86,3 +79,23 @@ Below are the guidelines for contributing a New Reusable Software Component as a
 - Use **release tag** instead of only **tag** to clarify the intent.
 - Git records the submodule's commit SHA, not the tag itself. Committing the updated submodule reference pins the parent repository to the commit associated with the selected release tag.
 - The clone and fork workflows differ slightly, so contributors should follow the branch and pull request process appropriate for their access level.
+
+
+# Resources & Support
+
+## Feedback & Support
+
+- [Renesas Wireless Connectivity Forum](https://community.renesas.com/wireles-connectivity)
+- [Contact Technical Support](https://www.renesas.com/eu/en/support?nid=1564826&issue_type=technical)
+- [Contact a Sales Representative](https://www.renesas.com/eu/en/buy-sample/locations)
+
+
+## Renesas General Reference(s)
+
+| Document | Description |
+|---|---|
+| [Renesas365](https://www.renesas.com/renesas365) | Discover, Select, and Develop MCU‑based Systems in One Connected Workflow |
+| [xplore repo FAQ](docs/faqs.md) | Anwers to Frequently Asked Questions when working with this repository. |
+| [Renesas VS Code Extensions User Guide](https://tool-support.renesas.com/e2studio/vscode/docs/index.html) | User Guide to support the development of Renesas C/C++ Projects in DA, RA, R-Car, RH850, RISC-V MCU, RL78, RX, RZ device families. |
+| [Renesas RA FSP Documentation](https://renesas.github.io/fsp/) | FSP API reference for all modules used |
+| [e² studio Renesas](https://www.renesas.com/en/software-tool/e2-studio?srsltid=AfmBOorTMc82ySC1OUrEN8SZbrQK2qXPYpFT_VatUYLmZMBeViM4bFTS) | e² studio user guide and tool page |
