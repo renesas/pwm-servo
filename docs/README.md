@@ -649,7 +649,7 @@ To build and run the project, the following resources are needed:
 ### 4.1.2 Software
 * e² studio v2026-04.2
 * VS Code with Renesas Platform Extension
-* FSP v6.5.0
+* FSP v6.4.0
 * LLVM for ARM v21.1.1
 
 ### 4.1.3 Connect the FPB-RA2E3 to SG90

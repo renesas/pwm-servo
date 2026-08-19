@@ -42,7 +42,7 @@ rule CUSTOM_COMMAND
 # Rule for re-running cmake.
 
 rule RERUN_CMAKE
-  command = C:\Users\a5132247\.renesas\platform\cmake\3.31.8\cmake-3.31.8-windows-x86_64\bin\cmake.exe --regenerate-during-build -SC:\Users\a5132247\gitlab_repo\pes-rc-hobby-servo-motor\examples\vscode\Servo_Motor_FPB_RA2E3 -BC:\Users\a5132247\gitlab_repo\pes-rc-hobby-servo-motor\examples\vscode\Servo_Motor_FPB_RA2E3\build\Debug
+  command = C:\Users\a5132247\.renesas\platform\cmake\3.31.8\cmake-3.31.8-windows-x86_64\bin\cmake.exe --regenerate-during-build -SC:\Users\a5132247\Documents\cmake_conv\servo\output\Servo_Motor_FPB_RA2E3 -BC:\Users\a5132247\Documents\cmake_conv\servo\output\Servo_Motor_FPB_RA2E3\build\Debug
   description = Re-running CMake...
   generator = 1
 
