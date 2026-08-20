@@ -1,4 +1,4 @@
-# RC Servo Motor Control
+# PWM Servo Motor Control
 RC servo motors are commonly used in robotics, automation, and embedded control systems to provide precise angular positioning. 
 This project demonstrates how a Renesas RA2 MCU can generate PWM (pulse-width modulation) motor control signals, while providing a reusable software layer for application development.
 A complete e² studio example project is included to showcase continuous servo sweep operation and provide a starting point for custom designs.
@@ -635,7 +635,7 @@ fsp_err_t servo_demo_entry(void)
 
 # 4. Running the Demo Application
 
-The example application titled "Servo_Motor_FPB_RA2E3" is located in /examples/e2studio. 
+The example application titled "PWM_Servo_Motor_FPB_RA2E3" is located in /examples/e2studio and /examples/vscode. 
 
 ## 4.1 Required Resources
 To build and run the project, the following resources are needed:
