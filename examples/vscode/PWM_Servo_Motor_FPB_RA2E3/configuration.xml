@@ -131,6 +131,10 @@
     <node id="board.clock.clkout.display" option="board.clock.clkout.display.value"/>
   </raClockConfiguration>
   <raComponentSelection>
+    <component apiversion="" class="Projects" condition="" group="all" subgroup="common" variant="" vendor="Renesas" version="6.5.0">
+      <description>Common source for all template projects.</description>
+      <originalPack>Renesas.RA_common.6.5.0.pack</originalPack>
+    </component>
     <component apiversion="" class="BSP" condition="" group="ra2e3" subgroup="device" variant="R7FA2E3073CFL" vendor="Renesas" version="6.5.0">
       <description>Board support package for R7FA2E3073CFL</description>
       <originalPack>Renesas.RA_mcu_ra2e3.6.5.0.pack</originalPack>
@@ -150,10 +154,6 @@
     <component apiversion="" class="BSP" condition="" group="ra2e3" subgroup="linker" variant="" vendor="Renesas" version="6.5.0">
       <description>Board support package for RA2E3 - Linker</description>
       <originalPack>Renesas.RA_mcu_ra2e3.6.5.0.pack</originalPack>
-    </component>
-    <component apiversion="" class="Projects" condition="" group="all" subgroup="common" variant="" vendor="Renesas" version="6.5.0">
-      <description>Common source for all template projects.</description>
-      <originalPack>Renesas.RA_common.6.5.0.pack</originalPack>
     </component>
     <component apiversion="" class="BSP" condition="" group="Board" subgroup="ra2e3_fpb" variant="" vendor="Renesas" version="6.5.0">
       <description>FPB-RA2E3 Board Support Files</description>

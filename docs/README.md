@@ -35,10 +35,18 @@ The repository is organized into major areas:
         - 1.2.3 [Position Control by Percentage](#123-position-control-by-percentage)
 2. [Application Overview](#2-application-overview)
     - 2.1 [Hardware](#21-hardware)
-        - 2.1.1 [FPB-RA2E3 Timer Selection](#211-fpb-ra2e3-timer-selection)
-    - 2.2 [FSP Modules Used](#22-fsp-modules-used)
-        - 2.2.1 [Module Configurations](#221-module-configurations)
-        - 2.2.2 [Pin Configurations](#222-pin-configurations)
+        - 2.1.1 [SG90 Waveform Specifications](#211-sg90-waveform-specifications)
+        - 2.1.2 [FPB-RA0L1 PWM Timer Analysis](#212-fpb-ra0l1-pwm-timer-analysis)
+        - 2.1.3 [FPB-RA2E3 PWM Timer Analysis](#213-fpb-ra2e3-pwm-timer-analysis)
+    - 2.2 [FSP Timers Supported](#22-fsp-timers-supported)
+        - 2.2.1 [R_TAU_PWM on RA0L1](#221-r_tau_pwm-on-ra0l1)
+            - 2.2.1.1 [R_TAU_PWM Module Stack Config](#2211-r_tau_pwm-module-stack-config)
+            - 2.2.1.2 [R_TAU_PWM Pin Config](#2212-r_tau_pwm-pin-config)
+            - 2.2.1.3 [R_TAU_PWM Clock Config](#2213-r_tau_pwm-clock-config)
+        - 2.2.2 [R_GPT on RA2E3](#222-r_gpt-on-ra2e3)
+            - 2.2.2.1 [R_GPT Module Stack Config](#2221-r_gpt-module-stack-config)
+            - 2.2.2.2 [R_GPT Pin Config](#2222-r_gpt-pin-config)
+            - 2.2.2.3 [R_GPT Clock Config](#2223-r_gpt-clock-config)
 3. [Public Function Layer: rs_servo](#3-public-function-layer-rs_servo)
     - 3.1 [Files](#31-files)
     - 3.2 [Public Data](#32-public-data)
@@ -58,7 +66,8 @@ The repository is organized into major areas:
     - 4.1 [Required Resources](#41-required-resources)
         - 4.1.1 [Hardware](#411-hardware)
         - 4.1.2 [Software](#412-software)
-        - 4.1.3 [Connect the FPB-RA2E3 to SG90](#413-connect-the-fpb-ra2e3-to-sg90)
+        - 4.1.3 [Connect SG90 to FPB-RA0L1](#413-connect-sg90-to-fpb-ra0l1)
+        - 4.1.4 [Connect SG90 to FPB-RA2E3](#414-connect-sg90-to-fpb-ra2e3)
     - 4.2 [Using FSP Stack vs Preset Configurations](#42-using-fsp-stack-vs-preset-configurations)
     - 4.3 [Note on SG90 Angle Response](#43-note-on-sg90-angle-response)
 5. [Limitations](#5-limitations)
@@ -217,15 +226,19 @@ The project provides a public function layer which includes routines for setting
 Together, these features demonstrate how RA MCU timer peripherals can be used to implement accurate and reusable servo motor control.
 
 ## 2.1 Hardware
-The demo application runs on the following hardware: 
+The demo application(s) run on the following hardware: 
+
+RA MCU(s):
+* FPB-RA0L1 MCU
+    * [RA0L1 Group User's Manual: Hardware ](https://www.renesas.com/en/document/mah/ra0l1-group-users-manual-hardware)
 * FPB-RA2E3 MCU
     * [RA2E3 Group User's Manual: Hardware ](https://www.renesas.com/en/document/mah/ra2e3-group-users-manual-hardware)
+
+Servo Peripheral:
 * SG90 Servo Motor
     * [SG90 Datasheet ](http://www.ee.ic.ac.uk/pcheung/teaching/DE1_EE/stores/sg90_datasheet.pdf)
 
-### 2.1.1 FPB-RA2E3 Timer Selection
-This section follows the analysis outlined in the Servo Motor Control Theory subsection Choosing the Right FSP Timer Peripheral.
-
+### 2.1.1 SG90 Waveform Specifications
 The SG90 is a 180° counter-clockwise rotating servo with the following PWM pulse parameters
 * Minimum pulse (represents -90°) = 1 ms
 * Maximum pulse (represents 90°) = 2 ms
@@ -234,13 +247,55 @@ The SG90 is a 180° counter-clockwise rotating servo with the following PWM puls
 <img src="images/sg90_pulse.png" alt="SG90 Pulse Waveform has a varying 1-2ms duty cycle and a 20ms period (50Hz)" width="400"/><br>
 
 
-Calculate the Servo PWM Resolution: <br>
-(Maximum Duty Cycle - Minimum Duty Cycle) / (Number of Positions) <br>= (2ms - 1ms)/ (180°) <br>= 5.5 us/degree
+Calculate the Servo PWM Resolution: 
+```text
+(Maximum Duty Cycle - Minimum Duty Cycle) / (Number of Positions) 
+= (2ms - 1ms)/ (180°) 
+= 5.5 us/degree
+```
 
 So each angle is represented by a pulse change about 5.5 us.
 
+### 2.1.2 FPB-RA0L1 PWM Timer Analysis
+This section follows the analysis outlined in the Servo Motor Control Theory subsection [Choosing the Right FSP Timer Peripheral](#11-choosing-the-right-fsp-timer-peripheral).
+
+The FPB-RA0L1 has 1 peripheral capable of generating PWM waveforms: the TAU. 
+To verify the timer's capability and find appropriate settings, analyze the TAU's clock settings in relation to the SG90 PWM signal requirements.
+
+The TAU has the following features:
+* Counter Width: 16 bit
+* Clock Source: PCLKB, with input from HOCO @32MHz
+* Clock Division: /1, /2, /4, /8, /16, /32, ..., /32768
+
+```text
+TAU Max Count = 2^(16) = 65,535
+
+Required Counts for PWM period: (32MHz / DIV) X (20ms)
+```
+Solve the following equation for the right division ratio (DIV) when PCLKB's input source is 32MHz:
+
+```text
+Required Counts ≤ Max Count 
+(32MHz/ DIV) x (20ms) ≤ 65,535
+9.76 ≤ DIV 
+```
+
+Rounding up to the next available setting as a power of 2, DIV = 16.
+
+Find the resulting Timer Tick Resolution:
+```text
+TAU Tick Resolution = DIV/CLK = 16/(32MHz) = 0.5 us
+```
+
+The resulting Tick Resolution of 0.5 us is much less than the Servo PWM Resolution of 5.5 us. 
+
+When the TAU has a clock source of 32MHz and a division ratio of 16, the timer can represent every angle of the servo motor accurately and fit the full PWM period in the counter.
+
+### 2.1.3 FPB-RA2E3 PWM Timer Analysis
+This section follows the analysis outlined in the Servo Motor Control Theory subsection [Choosing the Right FSP Timer Peripheral](#11-choosing-the-right-fsp-timer-peripheral).
+
 The FPB-RA2E3 has 2 peripherals capable of generating PWM waveforms: the GPT and the AGT. 
-Choosing the right timer requires analyzing the clock specifications in relation to the SG90 PWM signal. 
+Choosing the right timer requires analyzing the clock specifications in relation to the SG90 PWM signal requirements. 
 
 **GPT**<br>
 The GPT has the following features:
@@ -248,19 +303,25 @@ The GPT has the following features:
 * Source Clock: PCLKD, with input from HOCO @48MHz 
 * Clock Division: /1, /4, /16, /256, /1024
 
+```text
 GPT Max Count = 2^(32) = 4,294,967,295
 
 Required Counts for PWM period = (48MHz / DIV) x (20ms) 
+```
 
 Solve the following equation for the right division ratio (DIV) when PCLKD's input source is 48MHz: 
-<br>Required Counts ≤ Max Count 
-<br>(48MHz/ DIV) x (20ms) ≤ 4,294,967,295 
-<br> 0.02 ≤ DIV 
+```text
+Required Counts ≤ Max Count 
+(48MHz/ DIV) x (20ms) ≤ 4,294,967,295 
+0.02 ≤ DIV 
+```
+Rounding up to the next available setting,  DIV = 1. 
 
-So let DIV = 1. Find the resulting Timer Tick Resolution:<br>
-GPT Tick Resolution = 1/(48MHz) = 0.02us
-
-The resulting Tick Resolution is much less than the Servo PWM Resolution. When the GPT has a clock source of 48MHz and a division ratio of 1, the timer can represent every angle of the servo motor accurately and fit the full PWM period in the counter.
+Find the resulting Timer Tick Resolution:
+```text
+GPT Tick Resolution = DIV/CLK = 1/(48MHz) = 0.02 us
+```
+The resulting Tick Resolution of 0.02 us is much less than the Servo PWM Resolution of 5.5 us. When the GPT has a clock source of 48MHz and a division ratio of 1, the timer can represent every angle of the servo motor accurately and fit the full PWM period in the counter.
 
 **AGT**<br>
 The Low Power AGT has the following features: 
@@ -268,26 +329,65 @@ The Low Power AGT has the following features:
 * Source Clock: PCLKB, with input from HOCO @48Hz
 * Clock Division: /1, /2, /8
 
-AGT Max Count = 2 ^(16) = 65,535
+```text
+AGT Max Count = 2^(16) = 65,535
 
 Required Counts for PWM perod = (48MHz / DIV) x (20ms) 
-
+```
 Solve the following equation for the right division ratio (DIV) when PCLKB's input source is 48MHz: 
-<br>Required Counts ≤ Max Count 
-<br>(48MHz/ DIV) x (20ms) ≤ 65,535
-<br>14.64 ≤ DIV 
+```text
+Required Counts ≤ Max Count 
+(48MHz/ DIV) x (20ms) ≤ 65,535
+14.64 ≤ DIV 
+```
 
-Rounding up to the closest valid ratio gives DIV = 16. However, notice that the the max clock division ratio setting is /8. So this AGT module is not able to create a PWM signal that can represent every anglular position of the servo motor. 
+Rounding up to the closest valid ratio gives DIV = 16. However, notice that the the max clock division ratio setting is /8. So this AGT module is NOT able to create a PWM signal that can represent every anglular position of the servo motor. 
 
-## 2.2 FSP Modules Used
-The following module is used in the servo example project: 
+## 2.2 FSP Timers Supported
+The following timer modules are supported by the servo motor control layer. 
 
-| Module | Usage |
-|--------|------------------|
-| GPT | Create a variable duty-cycle PWM signal to control the SG90 motor |
+| MCU | PWM Timer Module | Usage |
+|-|-|-|
+| RA0L1 | TAU PWM | Create a variable duty-cycle PWM signal to control the SG90 motor |
+| RA2E3 | GPT | Create a variable duty-cycle PWM signal to control the SG90 motor |
 
-### 2.2.1 Module Configurations
-The following non-default FSP properties enable the R_GPT to control the SG90 servo:
+### 2.2.1 R_TAU_PWM on RA0L1 
+The TAU PWM module on the RA0L1 generates the PWM output. 
+
+#### 2.2.1.1 R_TAU_PWM Module Stack Config
+The following non-default FSP properties enable the R_TAU_PWM on the FPB-RA0L1 to control the SG90 servo:
+
+**Simultaneous Channel Operation**
+| Property Name | Value Used | Reason |
+|-|-|-|
+| Common → Interrupt Support | Disabled | PWM generation does not need interrupt support. |
+| General → Name | g_pwm_sg90 | Descriptive name. |
+| General → Period | 50 | The SG90 PWM period is 20ms which gives 50 Hz. |
+| General → Period Unit | Hz | Set the right unit Hz. |
+| Interrupts → Interrupt Priority | Disabled | PWM generation does not need interrupt callback. |
+
+**TAU PWM Channel 1 Configuration**
+| Property Name | Value Used | Reason |
+|-|-|-|
+| Output → PWM Duty Cycle Percent | 5 | A 5% duty cycle gives a 1ms pulse, corresponding to the -90° position. The TAU will initialize with this duty cycle. |
+| Interrupts → Interrupt Priority | Disabled | PWM generation does not need interupt. |
+| Pins → TO01 | P100 | Ensure the pin settings to make P100 available as TAU slave channel 1 output. |
+
+#### 2.2.1.2 R_TAU_PWM Pin Config
+The following pin configurations used in the project route the TAU PWM signal to output pin P100.
+
+<img src="images/pin_config_ra0l1.png" alt="FSP Pin Config for TAU01: Pin Group is Mixed, Operation Mode is Custom, and IO route TO01 to P100" width="450"/><br>
+
+#### 2.2.1.3 R_TAU_PWM Clock Config
+Based on the calculations in section [FPB-RA0L1 PWM Timer Analysis](#212-fpb-ra0l1-pwm-timer-analysis), the following clock tree settings were used for TAU:
+
+<img src="images/clock_tree_ra0l1.png" alt="FSP Clock Config for TAU CK00. Set ICLK Src: HOCO, TAU CK00 DIV /16" width="650"/><br>
+
+### 2.2.2 R_GPT on RA2E3
+The GPT module on the RA2E3 generates the PWM output. 
+
+#### 2.2.2.1 R_GPT Module Stack Config
+The following non-default FSP properties enable the R_GPT on the FPB-RA2E3 to control the SG90 servo:
 
 | Property Name | Value Used | Reason |
 |-|-|-|
@@ -299,12 +399,17 @@ The following non-default FSP properties enable the R_GPT to control the SG90 se
 | General → Period Unit | Hz | Set the right unit Hz. |
 | Output → Duty Cycle Percent | 5 | A 5% duty cycle gives a 1ms pulse, corresponding to the -90° position. The GPT will initialize with this duty cycle. |
 | Output → GTIOCB Output Enabled | True | Choose any non-conflicting output pin on either GTIOCA or B to output the PWM control signal. In this example the output is assigned to P212 on GTIOC0B. |
-| Pins → GTIOCB | 212 | Ensure the pin settings to make 212 available as GTIOCB output. |
+| Pins → GTIOCB | P212 | Ensure the pin settings to make P212 available as GTIOCB output. |
 
-### 2.2.2 Pin Configurations 
+#### 2.2.2.2 R_GPT Pin Config 
 The following pin configurations used in the project route the GPT PWM signal to output pin P212 on GTIOCB. 
 
-<img src="images/pin_config.png" alt="FSP Pin Config for GPT0: Pin Group is Mixed, Operation Mode is GTIOCA or GTIOCB, and IO route GTIOC0B to P212" width="450"/><br>
+<img src="images/pin_config_ra2e3.png" alt="FSP Pin Config for GPT0: Pin Group is Mixed, Operation Mode is GTIOCA or GTIOCB, and IO route GTIOC0B to P212" width="450"/><br>
+
+#### 2.2.2.3 R_GPT Clock Config
+Based on the calculations in section [FPB-RA2E3 PWM Timer Analysis](#213-fpb-ra2e3-pwm-timer-analysis), the GPT was selected and the following clock tree settings were used:
+
+<img src="images/clock_tree_ra2e3.png" alt="FSP Clock Config for PCLKD. Set Clock Src: HOCO and DIV /1" width="650"/><br>
 
 ***
 
@@ -315,11 +420,14 @@ The servo motor public function layer **rs_servo** is detailed here.
 ## 3.1 Files
 The source files can be found in the repo's /src folder and are located in the e² studio project's /src/rs_servo_motor folder. 
 
+
 | File | Contents |
 |-|-|
 | rs_servo_functions.c | Contains the public-function defitions for the **rs_servo** layer, along with internal helper functions. |
 | rs_servo_functions.h | Contains the public data to support the **rs_servo** functions. Any application files calling the public functions need to include this file. |
 | rs_servo_demo.c | Application layer which uses the public functions and data to demo a repeated sweep of the SG90 servo motor through its angle range. |
+| rs_servo_config_fpb_ra0l1_sg90.c | Pre-configured control structure for the instance of the TAU PWM HAL driver. Values are hardware-dependent on the FPB-RA0L1 and SG90 servo. |
+| rs_servo_config_fpb_ra0l1_sg90.h | Contains the FSP header files required for the project and external references to the control, config, and FSP API structures needed for the TAU PWM HAL. |
 | rs_servo_config_fpb_ra2e3_sg90.c | Pre-configured control structure for the instance of the GPT HAL driver. Values are hardware-dependent on the FPB-RA2E3 and SG90 servo. |
 | rs_servo_config_fpb_ra2e3_sg90.h | Contains the FSP header files required for the project and external references to the control, config, and FSP API structures needed for the GPT HAL. |
 
@@ -405,15 +513,16 @@ const servo_device_cfg_t g_sg90_motor_cfg =
 
 The type *servo_ctrl_t* provides a control block for the **rs_servo** functions. To guarantee proper operation of this layer, application code should never write over any members of a *servo_ctrl_t* instance. 
 
-> ℹ The main application layer must define a *servo_ctrl_t* instance initialized to 0. This instance will be passed into **rs_servo** function calls. Do not edit.
+Depending on whether the project includes the r_gpt.h or r_tau_pwm.h file, then either the GPT timer instance or TAU PWM timer instance will be defined in the *servo_ctrl_t* struct.
+
 
 | Member Name | Type |  Use |
 |-|-|-|
 | open | bool | The servo module's current state. |
-| timer_ctrl | gpt_instance_ctrl_t | SRAM copy of the control struct for use by the GPT HAL. |
-| timer_cfg | timer_cfg_t | SRAM copy of the config struct for use by the the GPT HAL. |
-| timer_cfg_extend | gpt_extended_cfg_t | SRAM copy of the extended config struct for use by the GPT HAL. |
-| timer | timer_instance_t | Generic public timer wrapper for the GPT instance in RAM. Creating a wrapper allows the rs_servo layer to call FSP timer APIs with timer-agnostic function pointers. |
+| timer_ctrl | gpt_instance_ctrl_t, tau_pwm_instance_ctrl_t | SRAM copy of the control struct for use by the GPT HAL. |
+| timer_cfg | timer_cfg_t | SRAM copy of the config struct for use by the the GPT or TAU PWM HAL. |
+| timer_cfg_extend | gpt_extended_cfg_t, tau_pwm_extended_cfg_t | SRAM copy of the extended config struct for use by the GPT or TAU PWM HAL. |
+| timer | timer_instance_t | Generic public timer wrapper for the GPT or TAU instance in RAM. Creating a wrapper allows the rs_servo layer to call FSP timer APIs with timer-agnostic function pointers. |
 | p_device | const servo_device_cfg_t * | Pointer to a constant servo_device_cfg_t that describes the behavior of the servo peripheral. |
 | pin_out | uint32_t | The output pins configuration of the underlying timer instance. |
 | period_counts | uint32_t | The number of timer counts for the servo's full PWM period. This value is calculated one-time when the module opens and is used in subsequent duty cycle updates. |
@@ -424,6 +533,8 @@ The SG90 demo application in rs_servo_demo_sg90.c creates a control instance for
  ```c
  servo_ctrl_t g_sg90_servo_ctrl = {0};
  ```
+
+> ℹ The main application layer must define a *servo_ctrl_t* instance initialized to 0. This instance will be passed into **rs_servo** function calls. 
 
 ## 3.3 Public Functions
 
@@ -641,10 +752,12 @@ The example application titled "PWM_Servo_Motor_FPB_RA2E3" is located in /exampl
 To build and run the project, the following resources are needed:
 
 ### 4.1.1 Hardware
-* Renesas RA MCU FPB-RA2E3 
+* Renesas RA MCU 
+    * FPB-RA0L1
+    * FPB-RA2E3 
 * USB Debug Cable
 * SG90 Servo Motor
-* Jumper Wires to connect SG90 to FPB-RA2E3
+* Jumper Wires to connect SG90 to RA MCU
 
 ### 4.1.2 Software
 * e² studio v2026-04.2
@@ -652,7 +765,14 @@ To build and run the project, the following resources are needed:
 * FSP v6.5.0
 * LLVM for ARM v21.1.1
 
-### 4.1.3 Connect the FPB-RA2E3 to SG90
+### 4.1.3 Connect SG90 to FPB-RA0L1 
+Connect the SG90 to the FPB-RA2E3:
+
+    * (+) SG90 goes to (5V) MCU
+    * (-) SG90 goes to (GND) MCU
+    * (PWM) SG90 goes to (P100) MCU
+
+### 4.1.4 Connect SG90 to FPB-RA2E3 
 Connect the SG90 to the FPB-RA2E3:
 
     * (+) SG90 goes to (5V) MCU
@@ -708,13 +828,15 @@ The risk of experimental maximum and minimum microsecond settings is assumed by 
 The current implementation has the following limitations:
 
 - The public function layer currently supports GPT timer peripherals only.
-- All PWM outputs used by the public function layer must originate from the same GPT channel configuration. Independent servo outputs require independent GPT instances.
+- All PWM outputs used by the public function layer must originate from the same GPT/TAU PWM channel configuration. Independent servo outputs require independent timer instances.
 - Each independently controlled servo motor requires:
-    - A dedicated GPT timer instance.
+    - A dedicated GPT or TAU PWM timer instance, exclusively.
     - A dedicated `servo_ctrl_t` control structure.
     - A dedicated `servo_device_cfg_t` configuration structure.
-- The public function layer assumes the PWM period and timer configuration have already been configured correctly for the target servo motor.
+- The public function layer assumes the PWM period and timer configuration are configured correctly for the target servo motor.
 - Only position-based control is supported. Continuous-rotation servos are not currently supported.
+- The rs_servo layer supports a project with exclusively either the R_GPT stack or the R_TAU_PWM stack. 
+    - The rs_servo layer will need to be updated if ported to another MCU's project that uses both the R_GPT and R_TAU_PWM stacks 
 
 ***
  
@@ -733,7 +855,7 @@ The demonstration project can be modified to evaluate different timer configurat
 The demo project can use either the provided preset configuration or the project's generated FSP configuration.
 
 - [ ] Set `USE_PRESET_CONFIG` to `0` to use the timer instance generated by `configuration.xml` and stored in `hal_data.c`.
-- [ ] Modify the GPT configuration* within the FSP Configuration editor.
+- [ ] Modify the GPT or TAU PWM configuration* within the FSP Configuration editor.
 - [ ] Generate project code after making configuration changes.
 - [ ] Verify the PWM output pin assignment.
 - [ ] Verify the PWM period and timer clock settings.

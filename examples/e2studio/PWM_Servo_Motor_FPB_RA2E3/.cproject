@@ -198,7 +198,7 @@
 								</option>
 							</tool>
 							<tool command="llvm-objcopy " id="com.renesas.cdt.managedbuild.llvm.arm.tool.Objcopy.409585487" name="Objcopy" superClass="com.renesas.cdt.managedbuild.llvm.arm.tool.Objcopy">
-								<option id="com.renesas.cdt.managedbuild.llvm.arm.option.objcopy.general.outformat.80638373" name="OutFormat" superClass="com.renesas.cdt.managedbuild.llvm.arm.option.objcopy.general.outformat" value="com.renesas.cdt.managedbuild.llvm.core.enumeratedOptionValue.intelHex" valueType="enumerated"/>
+								<option id="com.renesas.cdt.managedbuild.llvm.arm.option.objcopy.general.outformat.80638373" name="OutFormat" superClass="com.renesas.cdt.managedbuild.llvm.arm.option.objcopy.general.outformat" value="com.renesas.cdt.managedbuild.llvm.core.enumeratedOptionValue.srec" valueType="enumerated"/>
 							</tool>
 							<tool id="com.renesas.cdt.managedbuild.llvm.arm.tool.archiver.1102794109" name="Archiver" superClass="com.renesas.cdt.managedbuild.llvm.arm.tool.archiver"/>
 							<tool id="com.renesas.cdt.managedbuild.llvm.arm.tool.PrintSize.1579956993" name="Print Size" superClass="com.renesas.cdt.managedbuild.llvm.arm.tool.PrintSize">

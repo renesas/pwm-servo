@@ -6,9 +6,9 @@
       "request": "launch",
       "target": {
         "device": "R7FA2E307",
-        "board": "FPB-RA2E3",
+        "debuggerType": "SEGGERJLINKARM",
         "deviceFamily": "RA",
-        "debuggerType": "SEGGERJLINKARM"
+        "board": "FPB-RA2E3"
       },
       "images": []
     }

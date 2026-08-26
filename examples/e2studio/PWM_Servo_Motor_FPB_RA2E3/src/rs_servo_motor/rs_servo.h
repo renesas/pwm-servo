@@ -31,11 +31,20 @@ typedef struct st_servo_device_cfg
 typedef struct st_servo_ctrl
 {
     bool open;
-
+/* PWM Timer
+ * Supported: R_GPT, R_TAU_PWM */
+#ifdef R_GPT_H
     /* GPT Timer Instance */
     gpt_instance_ctrl_t timer_ctrl;
     timer_cfg_t timer_cfg;
     gpt_extended_cfg_t  timer_cfg_extend;
+#endif
+#ifdef R_TAU_PWM_H
+    /* TAU PWM Timer Instance */
+    tau_pwm_instance_ctrl_t timer_ctrl;
+    timer_cfg_t timer_cfg;
+    tau_pwm_extended_cfg_t  timer_cfg_extend;
+#endif
 
     /* Generic Public Timer Wrapper */
     timer_instance_t timer;
