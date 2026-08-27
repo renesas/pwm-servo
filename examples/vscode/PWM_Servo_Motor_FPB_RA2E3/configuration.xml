@@ -147,10 +147,6 @@
       <description>I/O Port</description>
       <originalPack>Renesas.RA.6.4.0.pack</originalPack>
     </component>
-    <component apiversion="" class="Projects" condition="" group="all" subgroup="common" variant="" vendor="Renesas" version="6.4.0">
-      <description>Common source for all template projects.</description>
-      <originalPack>Renesas.RA_common.6.4.0.pack</originalPack>
-    </component>
     <component apiversion="" class="BSP" condition="" group="ra2e3" subgroup="device" variant="R7FA2E3073CFL" vendor="Renesas" version="6.4.0">
       <description>Board support package for R7FA2E3073CFL</description>
       <originalPack>Renesas.RA_mcu_ra2e3.6.4.0.pack</originalPack>
@@ -174,6 +170,10 @@
     <component apiversion="" class="BSP" condition="" group="Board" subgroup="ra2e3_fpb" variant="" vendor="Renesas" version="6.4.0">
       <description>FPB-RA2E3 Board Support Files</description>
       <originalPack>Renesas.RA_board_ra2e3_fpb.6.4.0.pack</originalPack>
+    </component>
+    <component apiversion="" class="Projects" condition="" group="all" subgroup="common" variant="" vendor="Renesas" version="6.4.0">
+      <description>Common source for all template projects.</description>
+      <originalPack>Renesas.RA_common.6.4.0.pack</originalPack>
     </component>
   </raComponentSelection>
   <raElcConfiguration/>

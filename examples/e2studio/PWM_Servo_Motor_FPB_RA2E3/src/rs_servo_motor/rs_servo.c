@@ -4,9 +4,15 @@
 * SPDX-License-Identifier: BSD-3-Clause
 ***********************************************************************************************************************/
 #if USE_PRESET_CONFIG
+#include <rs_servo.h>
+
+#ifdef BSP_MCU_R7FA2E3073CFL
 #include <rs_servo_config_fpb_ra2e3_sg90.h>
 #endif
-#include <rs_servo.h>
+#ifdef BSP_MCU_R7FA0L1074CFL
+#include <rs_servo_config_fpb_ra0l1_sg90.h>
+#endif
+#endif
 
 #define RS_SERVO_DELAY_100MS     (100)
 #define RS_SERVO_DELAY_1S        (1000)
@@ -87,7 +93,8 @@ fsp_err_t rs_servo_Open(servo_ctrl_t *p_servo_ctrl, const servo_device_cfg_t *p_
     err = rs_servo_calculate_onetime_values(p_servo_ctrl);
     if(err) return err;
 
-    /* Identify output pin used for the timer. */
+    /* Identify output pin used for the timer module. */
+#ifdef R_GPT_H
     if( (p_servo_ctrl->timer_cfg_extend.gtioca.output_enabled == true )
             && (p_servo_ctrl->timer_cfg_extend.gtiocb.output_enabled == false)  )
     {
@@ -104,6 +111,10 @@ fsp_err_t rs_servo_Open(servo_ctrl_t *p_servo_ctrl, const servo_device_cfg_t *p_
     {
         p_servo_ctrl->pin_out = GPT_IO_PIN_GTIOCA_AND_GTIOCB;
     }
+#endif
+#ifdef R_TAU_PWM_H
+    p_servo_ctrl->pin_out = TAU_PWM_IO_PIN_CHANNEL_1;
+#endif
 
     /* Open and start the GPT at the smallest degree position */
     err = p_servo_ctrl->timer.p_api->open(p_servo_ctrl->timer.p_ctrl, p_servo_ctrl->timer.p_cfg);
@@ -220,14 +231,29 @@ fsp_err_t rs_servo_config_gen(servo_ctrl_t *p_servo_ctrl, const timer_instance_t
 
     /* Initialize configuration. */
     memset(&p_servo_ctrl->timer_cfg, 0, sizeof(timer_cfg_t));
+#ifdef R_GPT_H
     memset(&p_servo_ctrl->timer_cfg_extend, 0, sizeof(gpt_extended_cfg_t));
+#endif
+#ifdef R_TAU_PWM_H
+    memset(&p_servo_ctrl->timer_cfg_extend, 0, sizeof(tau_pwm_extended_cfg_t));
+#endif
 
     /* Copy configurations from the timer instance used into SRAM. */
     memcpy(&p_servo_ctrl->timer_cfg, p_timer_pwm->p_cfg, sizeof(timer_cfg_t));
+#ifdef R_GPT_H
     memcpy(&p_servo_ctrl->timer_cfg_extend, p_timer_pwm->p_cfg->p_extend,  sizeof(gpt_extended_cfg_t));
+#endif
+#ifdef R_TAU_PWM_H
+    memcpy(&p_servo_ctrl->timer_cfg_extend, p_timer_pwm->p_cfg->p_extend,  sizeof(tau_pwm_extended_cfg_t));
+#endif
 
     /* Manually assign addresses of p_extend to the extended configs in SRAM. */
+#ifdef R_GPT_H
     p_servo_ctrl->timer_cfg.p_extend = (gpt_extended_cfg_t *) &p_servo_ctrl->timer_cfg_extend;
+#endif
+#ifdef R_TAU_PWM_H
+    p_servo_ctrl->timer_cfg.p_extend = (tau_pwm_extended_cfg_t *) &p_servo_ctrl->timer_cfg_extend;
+#endif
 
     /* Build instance of the public timer wrapper by assigning pointers to its members. */
     p_servo_ctrl->timer.p_ctrl = &p_servo_ctrl->timer_ctrl;

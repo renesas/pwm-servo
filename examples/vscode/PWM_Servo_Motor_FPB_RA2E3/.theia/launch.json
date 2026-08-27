@@ -6,10 +6,10 @@
       "type": "renesas-web-debug",
       "request": "launch",
       "target": {
+        "device": "R7FA2E307",
         "board": "FPB-RA2E3",
         "deviceFamily": "RA",
-        "debuggerType": "WEBUSBJLINKARM",
-        "device": "R7FA2E307"
+        "debuggerType": "WEBUSBJLINKARM"
       },
       "projectRoot": "${workspaceFolder}/build/Debug",
       "images": []

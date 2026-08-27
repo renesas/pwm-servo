@@ -24,6 +24,14 @@ endif()
 
 #source directories
 file(GLOB_RECURSE Source_Files 
+    ${CMAKE_CURRENT_SOURCE_DIR}/ra/*.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/ra/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/ra/*.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/ra/*.cxx
+    ${CMAKE_CURRENT_SOURCE_DIR}/ra/*.S
+    ${CMAKE_CURRENT_SOURCE_DIR}/ra/*.asm
+    ${CMAKE_CURRENT_SOURCE_DIR}/ra/*.sx
+    ${CMAKE_CURRENT_SOURCE_DIR}/ra/*.msa
     ${CMAKE_CURRENT_SOURCE_DIR}/ra_gen/*.c
     ${CMAKE_CURRENT_SOURCE_DIR}/ra_gen/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ra_gen/*.cc
@@ -39,15 +47,7 @@ file(GLOB_RECURSE Source_Files
     ${CMAKE_CURRENT_SOURCE_DIR}/src/*.S
     ${CMAKE_CURRENT_SOURCE_DIR}/src/*.asm
     ${CMAKE_CURRENT_SOURCE_DIR}/src/*.sx
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/*.msa
-    ${CMAKE_CURRENT_SOURCE_DIR}/ra/*.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/ra/*.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/ra/*.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/ra/*.cxx
-    ${CMAKE_CURRENT_SOURCE_DIR}/ra/*.S
-    ${CMAKE_CURRENT_SOURCE_DIR}/ra/*.asm
-    ${CMAKE_CURRENT_SOURCE_DIR}/ra/*.sx
-    ${CMAKE_CURRENT_SOURCE_DIR}/ra/*.msa)
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/*.msa)
 
 # Exclude files from source build
 list(REMOVE_ITEM Source_Files ${EXCLUDED_SOURCE_FILES})
@@ -91,15 +91,14 @@ target_compile_definitions(${PROJECT_NAME}.elf PRIVATE ${RASC_CMAKE_DEFINITIONS}
 
 target_include_directories(${PROJECT_NAME}.elf
     PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/ra_cfg/fsp_cfg/bsp
-    ${CMAKE_CURRENT_SOURCE_DIR}/ra_gen
-    ${CMAKE_CURRENT_SOURCE_DIR}/ra_cfg/fsp_cfg
-    ${CMAKE_CURRENT_SOURCE_DIR}/src
+    ${CMAKE_CURRENT_SOURCE_DIR}/ra/arm/CMSIS_6/CMSIS/Core/Include
     ${CMAKE_CURRENT_SOURCE_DIR}/ra/fsp/inc
     ${CMAKE_CURRENT_SOURCE_DIR}/ra/fsp/inc/api
     ${CMAKE_CURRENT_SOURCE_DIR}/ra/fsp/inc/instances
-    ${CMAKE_CURRENT_SOURCE_DIR}/ra/arm/CMSIS_6/CMSIS/Core/Include
-    ${CMAKE_CURRENT_SOURCE_DIR}/.
+    ${CMAKE_CURRENT_SOURCE_DIR}/ra_cfg/fsp_cfg
+    ${CMAKE_CURRENT_SOURCE_DIR}/ra_cfg/fsp_cfg/bsp
+    ${CMAKE_CURRENT_SOURCE_DIR}/ra_gen
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}/
 )

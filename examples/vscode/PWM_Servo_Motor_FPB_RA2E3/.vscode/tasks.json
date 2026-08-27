@@ -11,12 +11,12 @@
         "open_rasc_PWM_Servo_Motor_FPB_RA2E3_cmake"
       ],
       "presentation": {
+        "clear": false,
         "panel": "shared",
         "echo": false,
         "focus": false,
         "reveal": "silent",
-        "showReuseMessage": false,
-        "clear": false
+        "showReuseMessage": false
       }
     },
     {

@@ -1,0 +1,17 @@
+{
+  "configurations": [
+    {
+      "name": "Renesas GDB Debugging",
+      "type": "renesas-hardware",
+      "request": "launch",
+      "target": {
+        "device": "R7FA0L107",
+        "board": "FPB-RA0L1",
+        "deviceFamily": "RA",
+        "debuggerType": "SEGGERJLINKARM"
+      },
+      "images": []
+    }
+  ],
+  "version": "0.2.0"
+}

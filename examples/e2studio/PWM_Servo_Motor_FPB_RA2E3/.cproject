@@ -3,7 +3,13 @@
 	<storageModule moduleId="org.eclipse.cdt.core.settings">
 		<cconfiguration id="com.renesas.cdt.managedbuild.llvm.arm.configuration.debug.506862228">
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="com.renesas.cdt.managedbuild.llvm.arm.configuration.debug.506862228" moduleId="org.eclipse.cdt.core.settings" name="Debug">
-				<externalSettings/>
+				<externalSettings>
+					<externalSetting>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/PWM_Servo_Motor_FPB_RA2E3"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/PWM_Servo_Motor_FPB_RA2E3/Debug"/>
+						<entry flags="RESOLVED" kind="libraryFile" name="PWM_Servo_Motor_FPB_RA2E3" srcPrefixMapping="" srcRootPath=""/>
+					</externalSetting>
+				</externalSettings>
 				<extensions>
 					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
 					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
@@ -19,7 +25,7 @@
 				<option id="toolchain.enable" value="true"/>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactExtension="elf" artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" cleanCommand="rm -rf" description="" id="com.renesas.cdt.managedbuild.llvm.arm.configuration.debug.506862228" name="Debug" parent="com.renesas.cdt.managedbuild.llvm.arm.configuration.debug">
+				<configuration artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" cleanCommand="rm -rf" description="" id="com.renesas.cdt.managedbuild.llvm.arm.configuration.debug.506862228" name="Debug" parent="com.renesas.cdt.managedbuild.llvm.arm.configuration.debug">
 					<folderInfo id="com.renesas.cdt.managedbuild.llvm.arm.configuration.debug.506862228." name="/" resourcePath="">
 						<toolChain id="com.renesas.cdt.managedbuild.llvm.arm.toolchain.debug.216923246" name="LLVM for ARM" superClass="com.renesas.cdt.managedbuild.llvm.arm.toolchain.debug">
 							<option id="com.renesas.cdt.managedbuild.llvm.core.option.cpu.printsize.997274270" name="Print Size" superClass="com.renesas.cdt.managedbuild.llvm.core.option.cpu.printsize" value="true" valueType="boolean"/>
@@ -50,7 +56,7 @@
 								<listOptionValue builtIn="false" value="-Wfloat-equal"/>
 							</option>
 							<option id="com.renesas.cdt.managedbuild.llvm.arm.option.cpu.family.371905160" name="ARM family" superClass="com.renesas.cdt.managedbuild.llvm.arm.option.cpu.family" value="com.renesas.cdt.managedbuild.llvm.arm.option.armspecific.family.cortex-m23" valueType="enumerated"/>
-							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="com.renesas.cdt.managedbuild.llvm.core.targetPlatform.1997103346" isAbstract="false" osList="all" superClass="com.renesas.cdt.managedbuild.llvm.core.targetPlatform"/>
+							<targetPlatform archList="all" id="com.renesas.cdt.managedbuild.llvm.core.targetPlatform.1997103346" isAbstract="false" osList="all" superClass="com.renesas.cdt.managedbuild.llvm.core.targetPlatform"/>
 							<builder buildPath="${workspace_loc:/pes_servo_fpb_ra2e3_DEV}/Debug" id="com.renesas.cdt.managedbuild.llvm.core.builder.1429476916" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="LLVM  for Renesas Builder" superClass="com.renesas.cdt.managedbuild.llvm.core.builder"/>
 							<tool id="com.renesas.cdt.managedbuild.llvm.arm.tool.smsAsm.1231208446" name="SMS Assembler" superClass="com.renesas.cdt.managedbuild.llvm.arm.tool.smsAsm"/>
 							<tool id="com.renesas.cdt.managedbuild.llvm.arm.tool.libgen.1638550114" name="Library Generator" superClass="com.renesas.cdt.managedbuild.llvm.arm.tool.libgen">
@@ -198,7 +204,7 @@
 								</option>
 							</tool>
 							<tool command="llvm-objcopy " id="com.renesas.cdt.managedbuild.llvm.arm.tool.Objcopy.409585487" name="Objcopy" superClass="com.renesas.cdt.managedbuild.llvm.arm.tool.Objcopy">
-								<option id="com.renesas.cdt.managedbuild.llvm.arm.option.objcopy.general.outformat.80638373" name="OutFormat" superClass="com.renesas.cdt.managedbuild.llvm.arm.option.objcopy.general.outformat" value="com.renesas.cdt.managedbuild.llvm.core.enumeratedOptionValue.intelHex" valueType="enumerated"/>
+								<option id="com.renesas.cdt.managedbuild.llvm.arm.option.objcopy.general.outformat.80638373" name="OutFormat" superClass="com.renesas.cdt.managedbuild.llvm.arm.option.objcopy.general.outformat" value="com.renesas.cdt.managedbuild.llvm.core.enumeratedOptionValue.srec" valueType="enumerated"/>
 							</tool>
 							<tool id="com.renesas.cdt.managedbuild.llvm.arm.tool.archiver.1102794109" name="Archiver" superClass="com.renesas.cdt.managedbuild.llvm.arm.tool.archiver"/>
 							<tool id="com.renesas.cdt.managedbuild.llvm.arm.tool.PrintSize.1579956993" name="Print Size" superClass="com.renesas.cdt.managedbuild.llvm.arm.tool.PrintSize">
@@ -317,7 +323,7 @@
 								<listOptionValue builtIn="false" value="-Wfloat-equal"/>
 							</option>
 							<option id="com.renesas.cdt.managedbuild.llvm.arm.option.cpu.family.221956135" name="ARM family" superClass="com.renesas.cdt.managedbuild.llvm.arm.option.cpu.family" value="com.renesas.cdt.managedbuild.llvm.arm.option.armspecific.family.cortex-m23" valueType="enumerated"/>
-							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="com.renesas.cdt.managedbuild.llvm.core.targetPlatform.1373376035" isAbstract="false" osList="all" superClass="com.renesas.cdt.managedbuild.llvm.core.targetPlatform"/>
+							<targetPlatform archList="all" id="com.renesas.cdt.managedbuild.llvm.core.targetPlatform.1373376035" isAbstract="false" osList="all" superClass="com.renesas.cdt.managedbuild.llvm.core.targetPlatform"/>
 							<builder buildPath="${workspace_loc:/pes_servo_fpb_ra2e3_DEV}/Release" id="com.renesas.cdt.managedbuild.llvm.core.builder.1945644193" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="LLVM  for Renesas Builder" superClass="com.renesas.cdt.managedbuild.llvm.core.builder"/>
 							<tool id="com.renesas.cdt.managedbuild.llvm.arm.tool.smsAsm.66885015" name="SMS Assembler" superClass="com.renesas.cdt.managedbuild.llvm.arm.tool.smsAsm"/>
 							<tool id="com.renesas.cdt.managedbuild.llvm.arm.tool.libgen.511503823" name="Library Generator" superClass="com.renesas.cdt.managedbuild.llvm.arm.tool.libgen">
