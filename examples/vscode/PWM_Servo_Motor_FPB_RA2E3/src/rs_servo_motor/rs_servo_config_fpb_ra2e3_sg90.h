@@ -13,6 +13,10 @@
 #include "r_gpt.h"
 #include "r_timer_api.h"
 FSP_HEADER
+
+/* The PWM Timer Module Used */
+#define PWM_SERVO_USE_GPT
+
 /** Timer on GPT Instance. */
 extern const timer_instance_t g_pwm_sg90_preset;
 

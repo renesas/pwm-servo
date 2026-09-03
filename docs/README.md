@@ -433,6 +433,11 @@ The source files can be found in the repo's /src folder and are located in the e
 
 > ℹ To use the **rs_servo** layer, copy the rs_servo_functions .c and .h file into the target project's source folder. Include the rs_servo_function.h file in each application file that uses the layer.
 
+The **rs_servo** can work exclusively with either the GPT or the PWM TAU module, by defining a macro "PWM_SERVO_USE_GPT" or "PWM_SERVO_USE_TAU", respectively. **It is prohibited to define both macros in the same application project.**
+This macro controls whether the GPT timer instance or TAU PWM timer instance will be defined in the *servo_ctrl_t* struct.
+
+In the demo application, the macro "PWM_SERVO_USE_\<Timer Module\>" is defined in the file rs_servo_config_\<RA Device Kit\>_sg90.h
+
 ## 3.2 Public Data
 The public data are defined in rs_servo_functions.h. The data is composed of an enumeration for the servo direction, a configuration struct for the servo's specifications, and a control struct for the public function layer.
 
@@ -512,8 +517,6 @@ const servo_device_cfg_t g_sg90_motor_cfg =
 ### 3.2.4 Servo Control Block
 
 The type *servo_ctrl_t* provides a control block for the **rs_servo** functions. To guarantee proper operation of this layer, application code should never write over any members of a *servo_ctrl_t* instance. 
-
-Depending on whether the project includes the r_gpt.h or r_tau_pwm.h file, then either the GPT timer instance or TAU PWM timer instance will be defined in the *servo_ctrl_t* struct.
 
 
 | Member Name | Type |  Use |
