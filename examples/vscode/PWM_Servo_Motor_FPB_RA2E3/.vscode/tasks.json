@@ -1,5 +1,4 @@
 {
-  "version": "2.0.0",
   "tasks": [
     {
       "type": "cmake",
@@ -11,12 +10,12 @@
         "open_rasc_PWM_Servo_Motor_FPB_RA2E3_cmake"
       ],
       "presentation": {
+        "showReuseMessage": false,
         "clear": false,
         "panel": "shared",
         "echo": false,
         "focus": false,
-        "reveal": "silent",
-        "showReuseMessage": false
+        "reveal": "silent"
       }
     },
     {
@@ -40,5 +39,6 @@
         "Configure Project"
       ]
     }
-  ]
+  ],
+  "version": "2.0.0"
 }

@@ -3,10 +3,20 @@
 *
 * SPDX-License-Identifier: BSD-3-Clause
 ***********************************************************************************************************************/
-#include "hal_data.h"
 
 #ifndef SERVO_MOTOR_SERVO_H_
 #define SERVO_MOTOR_SERVO_H_
+
+#include "hal_data.h"
+
+#if USE_PRESET_CONFIG
+#ifdef BSP_MCU_R7FA2E3073CFL
+#include <rs_servo_config_fpb_ra2e3_sg90.h>
+#endif
+#ifdef BSP_MCU_R7FA0L1074CFL
+#include <rs_servo_config_fpb_ra0l1_sg90.h>
+#endif
+#endif
 
 /* Public Data */
 
@@ -33,13 +43,13 @@ typedef struct st_servo_ctrl
     bool open;
 /* PWM Timer
  * Supported: R_GPT, R_TAU_PWM */
-#ifdef R_GPT_H
+#ifdef PWM_SERVO_USE_GPT
     /* GPT Timer Instance */
     gpt_instance_ctrl_t timer_ctrl;
     timer_cfg_t timer_cfg;
     gpt_extended_cfg_t  timer_cfg_extend;
 #endif
-#ifdef R_TAU_PWM_H
+#ifdef PWM_SERVO_USE_TAU
     /* TAU PWM Timer Instance */
     tau_pwm_instance_ctrl_t timer_ctrl;
     timer_cfg_t timer_cfg;
