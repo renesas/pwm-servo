@@ -62,5 +62,8 @@
         </peripheral>
         <peripheral name="TAU00.CM23" group="TAU" security=""/>
         <peripheral name="TAU01.CM23" group="TAU" security=""/>
+        <peripheral name="ICU.CM23">
+            <slot name="IRQ19.CM23" secure="false"/>
+        </peripheral>
     </partition>
 </azone>

@@ -79,7 +79,7 @@ const timer_cfg_t g_pwm_sg90_cfg =
     .p_context           = (void *) &NULL,
 #endif
     .p_extend            = &g_pwm_sg90_extend,
-    .cycle_end_ipl       = (BSP_IRQ_DISABLED),
+    .cycle_end_ipl       = (2),
 #if defined(VECTOR_NUMBER_TAU0_TMI00)
     .cycle_end_irq       = VECTOR_NUMBER_TAU0_TMI00,
 #else

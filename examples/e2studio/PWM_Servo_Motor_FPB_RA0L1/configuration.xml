@@ -202,7 +202,7 @@
       <property id="module.driver.timer.trigger_source" value="module.driver.tau_pwm.trigger_source.input_pin"/>
       <property id="module.driver.timer.detect_edge" value="module.driver.timer.detect_edge._rising"/>
       <property id="module.driver.timer.p_callback" value="NULL"/>
-      <property id="module.driver.timer.master_ipl" value="_disabled"/>
+      <property id="module.driver.timer.master_ipl" value="board.icu.common.irq.priority2"/>
     </module>
     <module id="module.driver.timer_channel.1679895639">
       <property id="module.driver.timer.slave_channel" value="1"/>

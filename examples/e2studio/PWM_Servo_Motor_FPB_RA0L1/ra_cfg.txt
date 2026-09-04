@@ -225,7 +225,7 @@ FSP Configuration
       Input (One-shot pulse): Trigger Source: TI0n pin
       Input (One-shot pulse): Detect Edge: Falling Edge
       Interrupts: Callback: NULL
-      Interrupts: Interrupt Priority: Disabled
+      Interrupts: Interrupt Priority: Priority 2
       
       Instance "TAU PWM Channel 1 Configuration (r_tau_pwm)"
         General: Channel: 1
