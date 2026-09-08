@@ -50,16 +50,22 @@ static fsp_err_t r_tau_pwm_parameter_checking(tau_pwm_instance_ctrl_t * const p_
 
 #endif
 
+#if TAU_PWM_CFG_INTERRUPT_SUPPORT_ENABLE
 static void r_tau_pwm_disable_irq(IRQn_Type irq);
 
 static void r_tau_pwm_enable_irq(IRQn_Type const irq, uint32_t priority, void * p_context);
 
+#endif
+
 /***********************************************************************************************************************
  * ISR prototypes
  **********************************************************************************************************************/
+#if TAU_PWM_CFG_INTERRUPT_SUPPORT_ENABLE
 void tau_pwm_common_tmi_isr(timer_event_t event);
 void tau_pwm_master_tmi_isr(void);
 void tau_pwm_slave_tmi_isr(void);
+
+#endif
 
 /***********************************************************************************************************************
  * Private global variables
@@ -109,7 +115,8 @@ const timer_api_t g_timer_on_tau_pwm =
  *                                        count of source divider/period/duty cycle/slave channels, or the trigger
  *                                        source.
  * @retval FSP_ERR_ALREADY_OPEN           Module is already open.
- * @retval FSP_ERR_IRQ_BSP_DISABLED       ISR of master channel must be enabled
+ * @retval FSP_ERR_IRQ_BSP_DISABLED       timer_cfg_t::p_callback is not NULL, but ISR is not enabled.
+ *                                        ISR must be enabled to use callback.
  * @retval FSP_ERR_INVALID_MODE           Invalid configuration option provided for selected timer mode
  * @retval FSP_ERR_INVALID_CHANNEL        The master/slave channel selected is not available on this device,
  *                                        slave channel number must be greater than master channel number.
@@ -491,26 +498,35 @@ fsp_err_t R_TAU_PWM_StatusGet (timer_ctrl_t * const p_ctrl, timer_status_t * con
  * @retval  FSP_SUCCESS                  Callback updated successfully.
  * @retval  FSP_ERR_ASSERTION            p_ctrl or p_callback was NULL.
  * @retval  FSP_ERR_NOT_OPEN             The instance is not opened.
+ * @retval  FSP_ERR_UNSUPPORTED          Function is not supported.
  **********************************************************************************************************************/
 fsp_err_t R_TAU_PWM_CallbackSet (timer_ctrl_t * const          p_api_ctrl,
                                  void (                      * p_callback)(timer_callback_args_t *),
                                  void * const                  p_context,
                                  timer_callback_args_t * const p_callback_memory)
 {
+    FSP_PARAMETER_NOT_USED(p_callback_memory);
+
+#if TAU_PWM_CFG_INTERRUPT_SUPPORT_ENABLE
     tau_pwm_instance_ctrl_t * p_ctrl = (tau_pwm_instance_ctrl_t *) p_api_ctrl;
 
-#if TAU_PWM_CFG_PARAM_CHECKING_ENABLE
+ #if TAU_PWM_CFG_PARAM_CHECKING_ENABLE
     FSP_ASSERT(p_ctrl);
     FSP_ASSERT(p_callback);
     FSP_ERROR_RETURN(TAU_PWM_OPEN == p_ctrl->open, FSP_ERR_NOT_OPEN);
-#endif
+ #endif
 
     p_ctrl->p_callback = p_callback;
     p_ctrl->p_context  = p_context;
 
-    FSP_PARAMETER_NOT_USED(p_callback_memory);
-
     return FSP_SUCCESS;
+#else
+    FSP_PARAMETER_NOT_USED(p_api_ctrl);
+    FSP_PARAMETER_NOT_USED(p_callback);
+    FSP_PARAMETER_NOT_USED(p_context);
+
+    return FSP_ERR_UNSUPPORTED;
+#endif
 }
 
 /*******************************************************************************************************************//**
@@ -535,16 +551,13 @@ fsp_err_t R_TAU_PWM_Close (timer_ctrl_t * const p_ctrl)
     /* Disable the output */
     R_TAU->TOE0 &= (uint16_t) ~(p_instance_ctrl->slave_channels_mask);
 
+#if TAU_PWM_CFG_INTERRUPT_SUPPORT_ENABLE
+
     /* Disable interrupts. */
     const tau_pwm_extended_cfg_t * p_extend = (tau_pwm_extended_cfg_t *) p_instance_ctrl->p_cfg->p_extend;
     r_tau_pwm_disable_irq(p_instance_ctrl->p_cfg->cycle_end_irq);
-#if TAU_PWM_CFG_PARAM_CHECKING_ENABLE
 
-    /* Clear open flag. */
-    p_instance_ctrl->open = 0U;
-#endif
-
-#if (1 == TAU_PWM_CFG_MULTI_SLAVE_ENABLE)
+ #if (1 == TAU_PWM_CFG_MULTI_SLAVE_ENABLE)
 
     /* Save the active slave mask; shift right because channel 0 cant be a slave */
     uint8_t slave_channels_mask = (p_instance_ctrl->slave_channels_mask >> 1);
@@ -562,7 +575,7 @@ fsp_err_t R_TAU_PWM_Close (timer_ctrl_t * const p_ctrl)
     } while (slave_channels_mask > 0);
 
     p_instance_ctrl->slave_channels_mask = 0;
-#else
+ #else
 
     /* Single slave mode always uses index 0 */
     if ((0 != p_instance_ctrl->slave_channels_mask) && (NULL != p_extend->p_slave_channel_cfgs[0]))
@@ -570,6 +583,15 @@ fsp_err_t R_TAU_PWM_Close (timer_ctrl_t * const p_ctrl)
         r_tau_pwm_disable_irq(p_extend->p_slave_channel_cfgs[0]->cycle_end_irq);
         p_instance_ctrl->slave_channels_mask = 0;
     }
+ #endif
+#else
+    p_instance_ctrl->slave_channels_mask = 0;
+#endif
+
+#if TAU_PWM_CFG_PARAM_CHECKING_ENABLE
+
+    /* Clear open flag. */
+    p_instance_ctrl->open = 0U;
 #endif
 
     return FSP_SUCCESS;
@@ -594,7 +616,8 @@ fsp_err_t R_TAU_PWM_Close (timer_ctrl_t * const p_ctrl)
  *                                        count of source divider/period/duty cycle/slave channels, or the trigger
  *                                        source.
  * @retval FSP_ERR_ALREADY_OPEN           Module is already open.
- * @retval FSP_ERR_IRQ_BSP_DISABLED       ISR of master channel must be enabled
+ * @retval FSP_ERR_IRQ_BSP_DISABLED       timer_cfg_t::p_callback is not NULL, but ISR is not enabled.
+ *                                        ISR must be enabled to use callback.
  * @retval FSP_ERR_INVALID_MODE           Simultaneous Channel Operation Function of TAU only support
  *                                        TIMER_MODE_ONE_SHOT and TIMER_MODE_PWM and event trigger source only
  *                                        supported in TIMER_MODE_ONE_SHOT mode
@@ -613,9 +636,6 @@ static fsp_err_t r_tau_pwm_parameter_checking (tau_pwm_instance_ctrl_t * const p
     /* Master channel must available on the device and must be even */
     FSP_ERROR_RETURN(((1 << p_cfg->channel) & BSP_FEATURE_TAU_VALID_CHANNEL_MASK) && !(p_cfg->channel & 0x01),
                      FSP_ERR_INVALID_CHANNEL);
-
-    /* Master channel's interrupt must be enabled */
-    FSP_ERROR_RETURN(p_cfg->cycle_end_irq >= 0, FSP_ERR_IRQ_BSP_DISABLED);
 
     tau_pwm_extended_cfg_t * p_extend = (tau_pwm_extended_cfg_t *) p_cfg->p_extend;
     uint32_t                 slave_channels_configured = 0U;
@@ -639,32 +659,41 @@ static fsp_err_t r_tau_pwm_parameter_checking (tau_pwm_instance_ctrl_t * const p
     FSP_ASSERT(TAU_PWM_SOURCE_PIN_INPUT == p_extend->trigger_source);
  #endif
 
+    bool is_slave_interrupt_enabled = false;
+
  #if (0 == TAU_PWM_CFG_MULTI_SLAVE_ENABLE)
     const uint8_t index = 0;
  #else
     for (uint8_t index = 0; index < TAU_PWM_MAX_NUM_SLAVE_CHANNELS; index++)
  #endif
     {
-        if (NULL != p_extend->p_slave_channel_cfgs[index])
+        const tau_pwm_channel_cfg_t * slave_channel_cfg = p_extend->p_slave_channel_cfgs[index];
+
+        if (NULL != slave_channel_cfg)
         {
-            uint8_t slaveChannel = p_extend->p_slave_channel_cfgs[index]->channel;
+            uint8_t slaveChannel = slave_channel_cfg->channel;
             slave_channels_configured++;
 
             /* Slave channel must be valid in range 1 to 7 and greater than master channel number */
-
             FSP_ERROR_RETURN((slaveChannel > TAU_PWM_SLAVE_CHANNEL_UNUSED) &&
-                             (slaveChannel <= TAU_PWM_MAX_CHANNEL_NUM) && /*This is TAU_PWM_MAX_CHANNEL_NUM
-                                                                           * because even with a single slave it could be any slave
-                                                                           * from 1-7 */
-                             (p_extend->p_slave_channel_cfgs[index]->channel > p_cfg->channel),
+                             (slaveChannel <= TAU_PWM_MAX_CHANNEL_NUM) &&
+                             (slave_channel_cfg->channel > p_cfg->channel),
                              FSP_ERR_INVALID_CHANNEL);
 
             /* Pulse width/duty cycle counts of slave channels must be in valid range */
             if (TIMER_SOURCE_DIV_1 == p_cfg->source_div)
             {
-                FSP_ASSERT(1 <= p_extend->p_slave_channel_cfgs[index]->duty_cycle_counts);
+                FSP_ASSERT(1 <= slave_channel_cfg->duty_cycle_counts);
             }
+
+            is_slave_interrupt_enabled |= (slave_channel_cfg->cycle_end_irq >= 0);
         }
+    }
+
+    /* The master or slave interrupt must be enabled if user supplied a callback function */
+    if (NULL != p_cfg->p_callback)
+    {
+        FSP_ERROR_RETURN((p_cfg->cycle_end_irq >= 0 || is_slave_interrupt_enabled), FSP_ERR_IRQ_BSP_DISABLED);
     }
 
     uint32_t master_counter_max = TAU_PWM_PRV_PERIOD_MAX;
@@ -816,8 +845,11 @@ static void r_tau_pwm_master_channel_initialize (tau_pwm_instance_ctrl_t * p_ins
     R_TAU->TO0  &= (uint16_t) ~(p_instance_ctrl->master_channel_mask);
     R_TAU->TOE0 &= (uint16_t) ~(p_instance_ctrl->master_channel_mask);
 
+#if TAU_PWM_CFG_INTERRUPT_SUPPORT_ENABLE
+
     /* Enables interrupt */
     r_tau_pwm_enable_irq(p_cfg->cycle_end_irq, p_cfg->cycle_end_ipl, p_instance_ctrl);
+#endif
 }
 
 /*******************************************************************************************************************//**
@@ -885,13 +917,18 @@ static void r_tau_pwm_slave_channels_initialize (tau_pwm_instance_ctrl_t * p_ins
 
             p_instance_ctrl->slave_channels_mask |= slave_channel_mask;
 
+#if TAU_PWM_CFG_INTERRUPT_SUPPORT_ENABLE
+
             /* Enables interrupt */
             r_tau_pwm_enable_irq(slave_channel_cfg->cycle_end_irq, slave_channel_cfg->cycle_end_ipl, p_instance_ctrl);
+#endif
         }
     }
 
     p_instance_ctrl->channels_mask = p_instance_ctrl->master_channel_mask | p_instance_ctrl->slave_channels_mask;
 }
+
+#if TAU_PWM_CFG_INTERRUPT_SUPPORT_ENABLE
 
 /*******************************************************************************************************************//**
  * Disables interrupt if it is a valid vector number.
@@ -974,3 +1011,5 @@ void tau_pwm_slave_tmi_isr (void)
     /* Restore context if RTOS is used */
     FSP_CONTEXT_RESTORE
 }
+
+#endif

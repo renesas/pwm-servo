@@ -6,6 +6,7 @@
         #endif
 
         #define TAU_PWM_CFG_PARAM_CHECKING_ENABLE (BSP_CFG_PARAM_CHECKING_ENABLE)
+        #define TAU_PWM_CFG_INTERRUPT_SUPPORT_ENABLE (1)
         #define TAU_PWM_CFG_ONE_SHOT_MODE_ENABLE (0)
         #define TAU_PWM_CFG_PWM_MODE_ENABLE (1)
         #define TAU_PWM_CFG_MULTI_SLAVE_ENABLE (0)

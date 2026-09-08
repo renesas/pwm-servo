@@ -193,6 +193,7 @@ FSP Configuration
     
   Module "Timer, Simultaneous Channel Operation (r_tau_pwm)"
     Parameter Checking: Default (BSP)
+    Interrupt Support: Enabled
     One-shot Pulse Output Mode Support: Disabled
     PWM Output Mode Support: Enabled
     Multi-Slave: Disabled
