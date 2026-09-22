@@ -95,7 +95,7 @@ Benefits of this approach include:
 - Updates are synchronized automatically.
 - Internal branches and development history remain private.
 
-For detailed instructions on configuring repository mirroring, including GitHub Personal Access Tokens, GitLab mirror settings, and branch-specific mirroring, see [mirrors.md](mirror.md).
+For detailed instructions on configuring repository mirroring, including GitHub Personal Access Tokens, GitLab mirror settings, and branch-specific mirroring, see [mirrors.md](./mirrors.md).
 
 > **Recommended Practice:** Use an orphan `release` branch to curate publishable content, then mirror only that branch to external repositories. This provides a clear separation between internal development and externally distributed source code.
 
