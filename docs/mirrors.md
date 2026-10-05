@@ -62,10 +62,10 @@ Settings → Repository
 
 | Setting               | Value                                                                              |     |
 | --------------------- | ---------------------------------------------------------------------------------- | --- |
-| Git Repository URL    | `https://<your-github-username>github.com/<your-github-username>/<repository>.git` |     |
+| Git Repository URL    | `https://<your-github-username>@github.com/<your-github-username>/<repository>.git` |     |
 | Mirror Direction      | `Push`                                                                             |     |
-| Authentication Method | `Password`                                                                         |     |
-| Username              | GitHub username                                                                    |     |
+| Authentication Method | `Password & Username`                                                                         |     |
+| Username              | <your-github-username> username                                                                    |     |
 | Password              | GitHub Personal Access Token                                                       |     |
 | Mirror Branches       | Mirror specific branches (Enter name of branch `release`)                          |     |
 
