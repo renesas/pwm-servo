@@ -14,7 +14,7 @@
 	path = debounce
 	url = git@gitlab.global.renesas.com:mcusys/gpio-debouncing.git
 [submodule "stdio-llvm"]
-	path = stdio-llvm
+	path = stdio-uart
 	url = git@gitlab.global.renesas.com:mcusys/pes-console-io.git
 [submodule "adc"]
 	path = adc
