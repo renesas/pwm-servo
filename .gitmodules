@@ -16,3 +16,6 @@
 [submodule "pwm-servo"]
 	path = pwm-servo
 	url = https://github.com/renesas/pwm-servo.git
+[submodule "stdio"]
+	path = stdio
+	url = https://github.com/renesas/stdio.git
