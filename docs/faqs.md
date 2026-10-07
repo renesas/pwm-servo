@@ -99,6 +99,71 @@ For detailed instructions on configuring repository mirroring, including GitHub 
 
 > **Recommended Practice:** Use an orphan `release` branch to curate publishable content, then mirror only that branch to external repositories. This provides a clear separation between internal development and externally distributed source code.
 
+## How do I replace an existing submodule with a different repository?
+
+Occasionally a component may be moved, renamed, consolidated into a different repository, or superseded by a newer implementation. In these situations, the existing submodule must be removed and replaced with a new one.
+
+Typical reasons include:
+
+- Migrating from a legacy repository to a maintained replacement.
+- Consolidating multiple repositories into a single solution.
+- Renaming a repository while preserving history.
+- Switching to a different implementation of the same feature.
+- Adopting a standardized Renesas component in place of a project-specific fork.
+
+A typical migration workflow is:
+
+```bash
+# Remove existing submodule
+git rm ./old-submodule
+git commit -m "Remove old submodule"
+
+# Add replacement submodule
+git submodule add <new-repository-url> ./new-submodule
+
+# Pin to a known-good version
+cd ./new-submodule
+git checkout <commit-hash>
+cd ..
+
+# Record the new submodule state
+git add .gitmodules ./new-submodule
+git commit -m "Add new submodule and pin version"
+
+# Publish the changes
+git push origin main
+```
+
+### When should I use this workflow?
+
+Use this workflow when the repository structure itself is changing. For example:
+
+- Replacing `stdio-uart` with `stdio`.
+- Migrating from an internal repository to a public repository.
+- Moving from a product-specific component to a shared Renesas solution.
+- Changing the local directory name associated with a submodule.
+
+### When should I NOT use this workflow?
+
+Do **not** use this workflow if you simply want to update an existing submodule to a newer version.
+
+For normal submodule updates, update the submodule reference instead:
+
+```bash
+cd ./existing-submodule
+git fetch
+git checkout <new-commit>
+cd ..
+
+git add ./existing-submodule
+git commit -m "Update submodule reference"
+```
+
+This keeps the existing submodule definition intact and only changes the version being referenced.
+
+> **Recommended Practice:** Pin new submodules to a specific commit rather than tracking a moving branch. This ensures reproducible builds and prevents unexpected changes when upstream repositories are updated.
+
+
 ## How do I discover what each submodule does?
 
 
