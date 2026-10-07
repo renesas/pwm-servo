@@ -1,6 +1,3 @@
-[submodule "pwm-servo"]
-	path = pwm-servo
-	url = https://github.com/renesas/pwm-servo
 [submodule "smooth-lighting-controller"]
 	path = smooth-lighting-controller
 	url = git@gitlab.global.renesas.com:mcusys/rs-smooth-lighting-controller.git
