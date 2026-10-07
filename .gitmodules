@@ -16,3 +16,6 @@
 [submodule "adc"]
 	path = adc
 	url = git@gitlab.global.renesas.com:mcusys/pes-adc.git
+[submodule "pwm-servo"]
+	path = pwm-servo
+	url = https://github.com/renesas/pwm-servo.git
