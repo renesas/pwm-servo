@@ -62,18 +62,20 @@ Settings → Repository
 
 | Setting               | Value                                                                              |     |
 | --------------------- | ---------------------------------------------------------------------------------- | --- |
-| Git Repository URL    | `https://<your-github-username>@github.com/<your-github-username>/<repository>.git` |     |
+| Git Repository URL    | `https://<your-github-username>@github.com/renesas/<repository-name>.git` |     |
 | Mirror Direction      | `Push`                                                                             |     |
 | Authentication Method | `Password & Username`                                                                         |     |
 | Username              | <your-github-username> username                                                                    |     |
 | Password              | GitHub Personal Access Token                                                       |     |
-| Mirror Branches       | Mirror specific branches (Enter name of branch `release`)                          |     |
+| Mirror Branches       | Mirror specific branches (Enter name of branch `release` or 'public-main')                          |     |
 
 **Example:**  
 
 ```text  
 
 https://renesasae@github.com/renesas/sbb-name.git  
+
+https://cat-kenzie@github.com/renesas/pwm-servo.git
 
 ```  
 5. Click **Mirror Repository**.  
