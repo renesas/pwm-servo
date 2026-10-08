@@ -36,19 +36,24 @@ Once you have met the [minimum requirements for reusable software](README.md#min
 2. Select the release tag that should be exposed to users.
    - Only approved and validated release tags should be used.
 
-3. Add the repository as a Git submodule:
+3. Perform a Git pull of the repo
+      ```bash
+   git pull origin main
+   ```
+
+4. Add the repository as a Git submodule:
 
    ```bash
    git submodule add <repository-url> <submodule-path>
    ```
 
-4. Initialize and update the submodule:
+5. Initialize and update the submodule:
 
    ```bash
-   git submodule update --init
+   git submodule update --init <submodule-name>
    ```
 
-5. Check out the selected release tag within the submodule:
+6. Check out the selected release tag within the submodule:
 
    ```bash
    cd <submodule-path>
@@ -56,7 +61,7 @@ Once you have met the [minimum requirements for reusable software](README.md#min
    cd ..
    ```
 
-6. Commit the updated submodule reference in the **xplore** repository to pin the submodule to the selected tag:
+7. Commit the updated submodule reference in the **xplore** repository to pin the submodule to the selected tag:
 
    ```bash
    git add <submodule-path>
