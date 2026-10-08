@@ -10,15 +10,15 @@
 [submodule "debounce"]
 	path = debounce
 	url = git@gitlab.global.renesas.com:mcusys/gpio-debouncing.git
-[submodule "stdio-uart"]
-	path = stdio-uart
-	url = https://github.com/renesas/stdio
 [submodule "adc"]
 	path = adc
 	url = git@gitlab.global.renesas.com:mcusys/pes-adc.git
 [submodule "pwm-servo"]
 	path = pwm-servo
 	url = https://github.com/renesas/pwm-servo.git
+[submodule "stdio"]
+	path = stdio
+	url = https://github.com/renesas/stdio.git
 [submodule "bit-banged-uart-tx"]
 	path = bit-banged-uart-tx
 	url = https://github.com/renesas/bb-uart-tx
