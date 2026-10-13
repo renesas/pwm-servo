@@ -134,6 +134,12 @@ git commit -m "Add new submodule and pin version"
 git push origin main
 ```
 
+If you run into remote issues you can try
+```bash
+git pull --rebase origin main
+git push origin main
+```
+
 ### When should I use this workflow?
 
 Use this workflow when the repository structure itself is changing. For example:
