@@ -15,62 +15,68 @@ A complete e² studio example project is included to showcase continuous servo s
 # Repository Organization
 
 The repository is organized into major areas:
+
 | Area | Purpose|
 |-|-|
-| docs/ | Documentation for the rs_servo public instance and demonstration.|
+| docs/ | Documentation for the rs_servo public instance and demonstration. |
 | examples/ | Complete reference project(s) for hardware evaluation and demonstration. |
 | src/ | Reusable configuration, public functions, and demonstration files. |
 
 ## Table of Contents
 
-1. [Servo Motor Control Theory](#1-servo-motor-control-theory)
-    - 1.1 [Choosing the Right FSP Timer Peripheral](#11-choosing-the-right-fsp-timer-peripheral)
-        - 1.1.1 [Servo Pulse-Width Resolution](#111-servo-pulse-width-resolution)
-        - 1.1.2 [Timer Configuration Constraints](#112-timer-configuration-constraints)
-        - 1.1.3 [Timer Tick Resolution](#113-timer-tick-resolution)
-        - 1.1.4 [Peripheral Selection](#114-peripheral-selection)
-    - 1.2 [Calculating Duty-Cycles at Runtime](#12-calculating-duty-cycles-at-runtime)
-        - 1.2.1 [One-time Values](#121-one-time-values)
-        - 1.2.2 [Position Control by Angle](#122-position-control-by-angle)
-        - 1.2.3 [Position Control by Percentage](#123-position-control-by-percentage)
-2. [Application Overview](#2-application-overview)
-    - 2.1 [Hardware](#21-hardware)
-        - 2.1.1 [SG90 Waveform Specifications](#211-sg90-waveform-specifications)
-        - 2.1.2 [FPB-RA0L1 PWM Timer Analysis](#212-fpb-ra0l1-pwm-timer-analysis)
-        - 2.1.3 [FPB-RA2E3 PWM Timer Analysis](#213-fpb-ra2e3-pwm-timer-analysis)
-    - 2.2 [FSP Timers Supported](#22-fsp-timers-supported)
-        - 2.2.1 [R_TAU_PWM on RA0L1](#221-r_tau_pwm-on-ra0l1)
-            - 2.2.1.1 [R_TAU_PWM Module Stack Config](#2211-r_tau_pwm-module-stack-config)
-            - 2.2.1.2 [R_TAU_PWM Pin Config](#2212-r_tau_pwm-pin-config)
-            - 2.2.1.3 [R_TAU_PWM Clock Config](#2213-r_tau_pwm-clock-config)
-        - 2.2.2 [R_GPT on RA2E3](#222-r_gpt-on-ra2e3)
-            - 2.2.2.1 [R_GPT Module Stack Config](#2221-r_gpt-module-stack-config)
-            - 2.2.2.2 [R_GPT Pin Config](#2222-r_gpt-pin-config)
-            - 2.2.2.3 [R_GPT Clock Config](#2223-r_gpt-clock-config)
-3. [Public Function Layer: rs_servo](#3-public-function-layer-rs_servo)
-    - 3.1 [Files](#31-files)
-    - 3.2 [Public Data](#32-public-data)
-        - 3.2.1 [Macros](#321-macros)
-        - 3.2.2 [Servo Direction Enum](#322-servo-direction-enum)
-        - 3.2.3 [Servo Device Configuration](#323-servo-device-configuration)
-        - 3.2.4 [Servo Control Block](#324-servo-control-block)
-    - 3.3 [Public Functions](#33-public-functions)
-        - 3.3.1 [rs_servo_SweepRangeOnce()](#331-rs_servo_sweeprangeonce)
-        - 3.3.2 [rs_servo_Open()](#332-rs_servo_open)
-        - 3.3.3 [rs_servo_Close()](#333-rs_servo_close)
-        - 3.3.4 [rs_servo_WriteAngle()](#334-rs_servo_writeangle)
-        - 3.3.5 [rs_servo_WritePercent()](#335-rs_servo_writepercent)
-        - 3.3.6 [Internal Functions](#336-internal-functions)
-    - 3.4 [Demo Application Layer](#34-demo-application-layer)
-4. [Running the Demo Application](#4-running-the-demo-application)
-    - 4.1 [Required Resources](#41-required-resources)
-        - 4.1.1 [Hardware](#411-hardware)
-        - 4.1.2 [Software](#412-software)
-        - 4.1.3 [Connect SG90 to FPB-RA0L1](#413-connect-sg90-to-fpb-ra0l1)
-        - 4.1.4 [Connect SG90 to FPB-RA2E3](#414-connect-sg90-to-fpb-ra2e3)
-    - 4.2 [Using FSP Stack vs Preset Configurations](#42-using-fsp-stack-vs-preset-configurations)
-    - 4.3 [Note on SG90 Angle Response](#43-note-on-sg90-angle-response)
+1. [Running the Demo Application](#1-running-the-demo-application)
+    - 1.1 [Required Resources](#11-required-resources)
+        - 1.1.1 [Hardware](#111-hardware)
+        - 1.1.2 [Software](#112-software)
+        - 1.1.3 [Connect SG90 to FPB-RA0L1](#113-connect-sg90-to-fpb-ra0l1)
+        - 1.1.4 [Connect SG90 to FPB-RA2E3](#114-connect-sg90-to-fpb-ra2e3)
+    - 1.2 [Using FSP Stack vs Preset Configurations](#12-using-fsp-stack-vs-preset-configurations)
+    - 1.3 [Note on SG90 Angle Response](#13-note-on-sg90-angle-response)
+
+2. [Servo Motor Control Theory](#2-servo-motor-control-theory)
+    - 2.1 [Choosing the Right FSP Timer Peripheral](#21-choosing-the-right-fsp-timer-peripheral)
+        - 2.1.1 [Servo Pulse-Width Resolution](#211-servo-pulse-width-resolution)
+        - 2.1.2 [Timer Configuration Constraints](#212-timer-configuration-constraints)
+        - 2.1.3 [Timer Tick Resolution](#213-timer-tick-resolution)
+        - 2.1.4 [Peripheral Selection](#214-peripheral-selection)
+    - 2.2 [Calculating Duty-Cycles at Runtime](#22-calculating-duty-cycles-at-runtime)
+        - 2.2.1 [One-time Values](#221-one-time-values)
+        - 2.2.2 [Position Control by Angle](#222-position-control-by-angle)
+        - 2.2.3 [Position Control by Percentage](#223-position-control-by-percentage)
+
+3. [Application Overview](#3-application-overview)
+    - 3.1 [Hardware](#31-hardware)
+        - 3.1.1 [SG90 Waveform Specifications](#311-sg90-waveform-specifications)
+        - 3.1.2 [FPB-RA0L1 PWM Timer Analysis](#312-fpb-ra0l1-pwm-timer-analysis)
+        - 3.1.3 [FPB-RA2E3 PWM Timer Analysis](#313-fpb-ra2e3-pwm-timer-analysis)
+    - 3.2 [FSP Timers Supported](#32-fsp-timers-supported)
+        - 3.2.1 [R_TAU_PWM on RA0L1](#321-r_tau_pwm-on-ra0l1)
+            - 3.2.1.1 [R_TAU_PWM Module Stack Config](#3211-r_tau_pwm-module-stack-config)
+            - 3.2.1.2 [R_TAU_PWM Pin Config](#3212-r_tau_pwm-pin-config)
+            - 3.2.1.3 [R_TAU_PWM Clock Config](#3213-r_tau_pwm-clock-config)
+        - 3.2.2 [R_GPT on RA2E3](#322-r_gpt-on-ra2e3)
+            - 3.2.2.1 [R_GPT Module Stack Config](#3221-r_gpt-module-stack-config)
+            - 3.2.2.2 [R_GPT Pin Config](#3222-r_gpt-pin-config)
+            - 3.2.2.3 [R_GPT Clock Config](#3223-r_gpt-clock-config)
+
+4. [Public Function Layer: rs_servo](#4-public-function-layer-rs_servo)
+    - 4.1 [Files](#41-files)
+    - 4.2 [Public Data](#42-public-data)
+        - 4.2.1 [Macros](#421-macros)
+        - 4.2.2 [Servo Direction Enum](#422-servo-direction-enum)
+        - 4.2.3 [Servo Device Configuration](#423-servo-device-configuration)
+        - 4.2.4 [Servo Control Block](#424-servo-control-block)
+    - 4.3 [Public Functions](#43-public-functions)
+        - 4.3.1 [rs_servo_SweepRangeOnce()](#431-rs_servo_sweeprangeonce)
+        - 4.3.2 [rs_servo_Open()](#432-rs_servo_open)
+        - 4.3.3 [rs_servo_Close()](#433-rs_servo_close)
+        - 4.3.4 [rs_servo_WriteAngle()](#434-rs_servo_writeangle)
+        - 4.3.5 [rs_servo_WritePercent()](#435-rs_servo_writepercent)
+        - 4.3.6 [Internal Functions](#436-internal-functions)
+    - 4.4 [Demo Application Layer](#44-demo-application-layer)
+
 5. [Limitations](#5-limitations)
+
 6. [Integration / Reusability](#6-integration--reusability)
     - 6.1 [Inside the Demo Application](#61-inside-the-demo-application)
         - 6.1.1 [Demo Application Using FSP Configuration](#611-demo-application-using-fsp-configuration)
@@ -84,8 +90,90 @@ The repository is organized into major areas:
         - 6.2.6 [Servo Shut-down](#626-servo-shut-down)
         - 6.2.7 [Drive Multiple Servo Motors](#627-drive-multiple-servo-motors)
 
+
 ***
-# 1. Servo Motor Control Theory
+
+# 1. Running the Demo Application
+
+The example application titled "PWM_Servo_Motor_FPB_RA2E3" is located in /examples/e2studio and /examples/vscode. 
+
+## 1.1 Required Resources
+To build and run the project, the following resources are needed:
+
+### 4.1.1 Hardware
+* Renesas RA MCU 
+    * FPB-RA0L1
+    * FPB-RA2E3 
+* USB Debug Cable
+* SG90 Servo Motor
+* Jumper Wires to connect SG90 to RA MCU
+
+### 1.1.2 Software
+* e² studio v2026-04.2
+* VS Code with Renesas Platform Extension
+* FSP v6.5.0
+* LLVM for ARM v21.1.1
+
+### 1.1.3 Connect SG90 to FPB-RA0L1 
+Connect the SG90 to the FPB-RA2E3:
+
+    * (+) SG90 goes to (5V) MCU
+    * (-) SG90 goes to (GND) MCU
+    * (PWM) SG90 goes to (P100) MCU
+
+### 1.1.4 Connect SG90 to FPB-RA2E3 
+Connect the SG90 to the FPB-RA2E3:
+
+    * (+) SG90 goes to (5V) MCU
+    * (-) SG90 goes to (GND) MCU
+    * (PWM) SG90 goes to (P212) MCU
+
+## 1.2 Using FSP Stack vs Preset Configurations 
+In the project, the required GPT module settings are saved in flash and at runtime are copied into SRAM for use by the FSP APIs. 
+There are 2 identical flash copies of the required configurations in the project:
+* g_pwm_sg90 
+    * Located in /ra_gen folder in hal_data.c and .h
+    * Data is auto generated based on the project's FSP Stack and Pin configurations
+* g_pwm_sg90_preset
+    * Located in /src/rs_servo_motor directory in rs_servo_config_fpb_ra2e3_sg90. and .h
+    * Data is identical copy of the FSP configurations and is tailored for the hardware
+
+For guaranteed demo operation, do not edit these files or overwrite the project's original FSP Configurations. 
+ 
+The following image shows the files containing the flash configuration copies in the project's workspace. The FSP configuration files with flash instance **g_pwm_sg90** are highlighted in orange and those with flash instance **g_pwm_sg90_preset** are highlighted in green.
+
+<img src="images/flash_configs.jpg" alt="Instance g_pwm_sg90 is defined in ra_gen/hal_data.c and .h and instance g_pwm_preset is defined in src/rs_servo_motor/rs_servo_config_fpb_ra2e3_sg90.c and .h" width="800"/><br>
+
+The macro USE_PRESET_CONFIG is defined in the Project Properties > C/C++ Build settings. It determines which flash configuration will be copied into SRAM at runtime. Its value can be set using the project property shown below:
+
+<img src="images/use_preset_config_macro.jpg" alt="Project macros are in the Project Settings > C/C++ Build > Settings > Tool Settings tab > Compiler > Includes > Macro Defines section" width="500"/><br>
+
+The rs_servo_Open() routine automatically calls the internal routine rs_servo_config_gen() with the GPT instance that corresponds to the value of USE_PRESET_CONFIG.
+* USE_PRESET_CONFIG = 1 selects **g_pwm_sg90_preset**
+* USE_PRESET_CONFIG = 0 selects **g_pwm_sg90**
+
+<img src="images/config_gen_in_open.jpg" alt="USE_PRESET_CONFIG Determines the GPT Configuration Instance Used" width="800"/><br>
+
+The SRAM copy is stored as multiple members of the servo control block *servo_ctrl_t* and are highlighted in blue below. The configurations are additionally wrapped up by a public timer instance in SRAM highlighted in purple.
+
+<img src="images/sram_copy.jpg" alt="The SRAM Copy Is a Member of the Servo Control Block" width="400"/><br>
+
+The rs_servo_config_gen() routine first copies the GPT configuration flash instances into the servo control block, then it wraps them all in the public timer instance:
+
+<img src="images/config_gen_copy.jpg" alt="The Internal Routine ConfigbGen Automatically Copies Flash Configurations into SRAM" width="800"/><br>
+
+## 1.3 Note on SG90 Angle Response
+The SG90 datasheet commonly specifies a control pulse width range of 1 ms to 2 ms, corresponding to approximately -90° to +90° (180° total travel). In practice, however, the SG90 is a low-cost hobby servo and its actual mechanical range can vary significantly between units.
+
+Many SG90 servos do not achieve a full 180° sweep when driven with 1 ms and 2 ms pulse widths. Manufacturing tolerances, gear alignment, internal potentiometer calibration, and mechanical end stops often limit the usable travel to less than the advertised range. It is therefore normal to observe total motion less than 180°, sometimes as limited as 90°.
+
+For applications requiring precise angular positioning, the relationship between pulse width and output angle can be characterized experimentally on the target hardware rather than relying solely on the values stated in the datasheet. However, driving beyond the servo's actual mechanical limits can cause increased current consumption, audible buzzing, heat generation, and premature wear.
+
+The risk of experimental maximum and minimum microsecond settings is assumed by the user. 
+
+***
+
+# 2. Servo Motor Control Theory
 An RC servo is controlled through a PWM signal, which is a series of repeating pulses of variable width. 
 The width of the pulse determines the angular position of the servo. 
 
@@ -98,7 +186,7 @@ The parameters are also commonly referred to as the minumum duty cycle, maximum 
 
 Standard 180-degree servos have parameter values of 1ms, 2ms, and 20ms (50 Hz), respectively. There are some servos with values that stray from this norm, but it is uncommon.
 
-## 1.1 Choosing the Right FSP Timer Peripheral
+## 2.1 Choosing the Right FSP Timer Peripheral
 On RA2 MCUs both the AGT (Asynchronous General Purpose Timer) and GPT (General PWM Timer) peripherals are capable of generating PWM signals to control servos.
 On all RA MCUs this list expands to include the TAU (Timer Array Unit) and the ULPT (Ultra Low-Power Timer). 
 
@@ -110,7 +198,7 @@ Essentially this is answering the following in combination:
 * Can the timer achieve the right resolution to represent every position of the servo? 
 * Can the timer counter width fit the full servo PWM period? 
 
-### 1.1.1 Servo Pulse-Width Resolution
+### 2.1.1 Servo Pulse-Width Resolution
 The servo's minimum pulse-width change between adjacent positions can be referred to as the servo's pulse-width resolution. 
 
 To calculate, use the following formula:
@@ -121,7 +209,7 @@ Pulse-Width Resolution = ------------------------------------------
                                     Number of Positions
 ```
  
-### 1.1.2 Timer Configuration Constraints
+### 2.1.2 Timer Configuration Constraints
 The timer peripheral's configured clock source frequency and divider must allow the servo's PWM period to fit within the timer's maximum counter value. 
 
 The maximum timer count is determined by the timer's counter width (in bits):
@@ -145,7 +233,7 @@ Required Counts ≤ Maximum Timer Count
 
 Use the Hardware User's Manual to verify the clock source and divider values are valid settings for the timer in question.
 
-### 1.1.3 Timer Tick Resolution
+### 2.1.3 Timer Tick Resolution
 Once a valid source clock frequecy and divider combination is found, use the following formula to verify the resolution between timer ticks:
 
 ```text
@@ -153,7 +241,7 @@ Once a valid source clock frequecy and divider combination is found, use the fol
 Tick Resolution = ---------------
                     Clock Source
 ```
-### 1.1.4 Peripheral Selection
+### 2.1.4 Peripheral Selection
 For precise motor positioning, the timer tick resolution must be finer than the minimum pulse-width change between adjacent positions of the servo.
 If not, multiple servo positions may map to the same timer count value, reducing positioning accuracy.
 
@@ -162,14 +250,14 @@ Ensure:
 Timer Tick Resolution < Servo Pulse-Width Resolution
 ```
 
-## 1.2 Calculating Duty-Cycles at Runtime
+## 2.2 Calculating Duty-Cycles at Runtime
 Servo position is controlled by varying the PWM pulse width. Each valid servo position corresponds to a pulse width between the specified minimum and maximum duty cycles.
 
 Each FSP timer's drivers include a `DutyCycleSet()` API to update the PWM pulse width at runtime. It accepts the new duty cycle value in units of raw timer counts. 
 
 The maximum raw timer count (determined by the timer's counter width) represents the servo's full PWM period. To set a specific servo position, calculate a new pulse width (in raw counts) as the right fraction between the servo's minimum and maximum pulse widths.
 
-### 1.2.1 One-time Values
+### 2.2.1 One-time Values
 Firstly, calculate the servo's minumum and maximum duty cycles as raw timer counts. Then use these values to calculate subsequent updates to timer's PWM duty cycle.
 
 The FSP timer API `InfoGet()` can get the clock frequency and clock period (in raw counts) of any open timer.
@@ -188,7 +276,7 @@ Maximum Duty Count =  -----------------------------------------------
                                     (# us per second)
 ```
 
-### 1.2.2 Position Control by Angle
+### 2.2.2 Position Control by Angle
 The most common control method is to specify a target angle. The driver converts the requested angle into the corresponding duty-cycle count between the configured minimum and maximum pulse widths.
 
 For a 180° servo, this provides up to 180 discrete position steps across the servo's operating range.
@@ -202,7 +290,7 @@ Duty Cycle Count = Minimum Duty Count + --------------- x (Maximum Duty Count - 
                                           # of Angles
 ```
 
-### 1.2.3 Position Control by Percentage
+### 2.2.3 Position Control by Percentage
 An alternative control method is to specify the desired position as a percentage of the servo's travel range. A value of 0% corresponds to the minimum pulse width, while 100% corresponds to the maximum pulse width.
 
 This approach provides 100 discrete position steps across the servo's operating range.
@@ -216,7 +304,7 @@ Duty Cycle Count = Minimum Duty Count + ---------------- x (Maximum Duty Count -
 
 ***
 
-# 2. Application Overview
+# 3. Application Overview
 This project applies the servo control theory described in the previous sections to control an SG90 servo motor connected to an FPB-RA2E3 board. 
 
 After initialization, the application continuously sweeps the servo shaft through its full range of motion by stepping through each angle from 0° to 180°, returning back to 0°, and pausing for one second before repeating the cycle. 
@@ -225,7 +313,7 @@ The project provides a public function layer which includes routines for setting
 
 Together, these features demonstrate how RA MCU timer peripherals can be used to implement accurate and reusable servo motor control.
 
-## 2.1 Hardware
+## 3.1 Hardware
 The demo application(s) run on the following hardware: 
 
 RA MCU(s):
@@ -238,7 +326,7 @@ Servo Peripheral:
 * SG90 Servo Motor
     * [SG90 Datasheet ](http://www.ee.ic.ac.uk/pcheung/teaching/DE1_EE/stores/sg90_datasheet.pdf)
 
-### 2.1.1 SG90 Waveform Specifications
+### 3.1.1 SG90 Waveform Specifications
 The SG90 is a 180° counter-clockwise rotating servo with the following PWM pulse parameters
 * Minimum pulse (represents -90°) = 1 ms
 * Maximum pulse (represents 90°) = 2 ms
@@ -256,7 +344,7 @@ Calculate the Servo PWM Resolution:
 
 So each angle is represented by a pulse change about 5.5 us.
 
-### 2.1.2 FPB-RA0L1 PWM Timer Analysis
+### 3.1.2 FPB-RA0L1 PWM Timer Analysis
 This section follows the analysis outlined in the Servo Motor Control Theory subsection [Choosing the Right FSP Timer Peripheral](#11-choosing-the-right-fsp-timer-peripheral).
 
 The FPB-RA0L1 has 1 peripheral capable of generating PWM waveforms: the TAU. 
@@ -291,7 +379,7 @@ The resulting Tick Resolution of 0.5 us is much less than the Servo PWM Resoluti
 
 When the TAU has a clock source of 32MHz and a division ratio of 16, the timer can represent every angle of the servo motor accurately and fit the full PWM period in the counter.
 
-### 2.1.3 FPB-RA2E3 PWM Timer Analysis
+### 3.1.3 FPB-RA2E3 PWM Timer Analysis
 This section follows the analysis outlined in the Servo Motor Control Theory subsection [Choosing the Right FSP Timer Peripheral](#11-choosing-the-right-fsp-timer-peripheral).
 
 The FPB-RA2E3 has 2 peripherals capable of generating PWM waveforms: the GPT and the AGT. 
@@ -343,7 +431,7 @@ Required Counts ≤ Max Count
 
 Rounding up to the closest valid ratio gives DIV = 16. However, notice that the the max clock division ratio setting is /8. So this AGT module is NOT able to create a PWM signal that can represent every anglular position of the servo motor. 
 
-## 2.2 FSP Timers Supported
+## 3.2 FSP Timers Supported
 The following timer modules are supported by the servo motor control layer. 
 
 | MCU | PWM Timer Module | Usage |
@@ -351,13 +439,14 @@ The following timer modules are supported by the servo motor control layer.
 | RA0L1 | TAU PWM | Create a variable duty-cycle PWM signal to control the SG90 motor |
 | RA2E3 | GPT | Create a variable duty-cycle PWM signal to control the SG90 motor |
 
-### 2.2.1 R_TAU_PWM on RA0L1 
+### 3.2.1 R_TAU_PWM on RA0L1 
 The TAU PWM module on the RA0L1 generates the PWM output. 
 
-#### 2.2.1.1 R_TAU_PWM Module Stack Config
+#### 3.2.1.1 R_TAU_PWM Module Stack Config
 The following non-default FSP properties enable the R_TAU_PWM on the FPB-RA0L1 to control the SG90 servo:
 
 **Simultaneous Channel Operation**
+
 | Property Name | Value Used | Reason |
 |-|-|-|
 | Common → Interrupt Support | Disabled | PWM generation does not need interrupt support. |
@@ -367,26 +456,27 @@ The following non-default FSP properties enable the R_TAU_PWM on the FPB-RA0L1 t
 | Interrupts → Interrupt Priority | Disabled | PWM generation does not need interrupt callback. |
 
 **TAU PWM Channel 1 Configuration**
+
 | Property Name | Value Used | Reason |
 |-|-|-|
 | Output → PWM Duty Cycle Percent | 5 | A 5% duty cycle gives a 1ms pulse, corresponding to the -90° position. The TAU will initialize with this duty cycle. |
 | Interrupts → Interrupt Priority | Disabled | PWM generation does not need interupt. |
 | Pins → TO01 | P100 | Ensure the pin settings to make P100 available as TAU slave channel 1 output. |
 
-#### 2.2.1.2 R_TAU_PWM Pin Config
+#### 3.2.1.2 R_TAU_PWM Pin Config
 The following pin configurations used in the project route the TAU PWM signal to output pin P100.
 
 <img src="images/pin_config_ra0l1.jpg" alt="FSP Pin Config for TAU01: Pin Group is Mixed, Operation Mode is Custom, and IO route TO01 to P100" width="450"/><br>
 
-#### 2.2.1.3 R_TAU_PWM Clock Config
+#### 3.2.1.3 R_TAU_PWM Clock Config
 Based on the calculations in section [FPB-RA0L1 PWM Timer Analysis](#212-fpb-ra0l1-pwm-timer-analysis), the following clock tree settings were used for TAU:
 
 <img src="images/clock_tree_ra0l1.jpg" alt="FSP Clock Config for TAU CK00. Set ICLK Src: HOCO, TAU CK00 DIV /16" width="650"/><br>
 
-### 2.2.2 R_GPT on RA2E3
+### 3.2.2 R_GPT on RA2E3
 The GPT module on the RA2E3 generates the PWM output. 
 
-#### 2.2.2.1 R_GPT Module Stack Config
+#### 3.2.2.1 R_GPT Module Stack Config
 The following non-default FSP properties enable the R_GPT on the FPB-RA2E3 to control the SG90 servo:
 
 | Property Name | Value Used | Reason |
@@ -401,23 +491,23 @@ The following non-default FSP properties enable the R_GPT on the FPB-RA2E3 to co
 | Output → GTIOCB Output Enabled | True | Choose any non-conflicting output pin on either GTIOCA or B to output the PWM control signal. In this example the output is assigned to P212 on GTIOC0B. |
 | Pins → GTIOCB | P212 | Ensure the pin settings to make P212 available as GTIOCB output. |
 
-#### 2.2.2.2 R_GPT Pin Config 
+#### 3.2.2.2 R_GPT Pin Config 
 The following pin configurations used in the project route the GPT PWM signal to output pin P212 on GTIOCB. 
 
 <img src="images/pin_config_ra2e3.jpg" alt="FSP Pin Config for GPT0: Pin Group is Mixed, Operation Mode is GTIOCA or GTIOCB, and IO route GTIOC0B to P212" width="450"/><br>
 
-#### 2.2.2.3 R_GPT Clock Config
+#### 3.2.2.3 R_GPT Clock Config
 Based on the calculations in section [FPB-RA2E3 PWM Timer Analysis](#213-fpb-ra2e3-pwm-timer-analysis), the GPT was selected and the following clock tree settings were used:
 
 <img src="images/clock_tree_ra2e3.jpg" alt="FSP Clock Config for PCLKD. Set Clock Src: HOCO and DIV /1" width="650"/><br>
 
 ***
 
-# 3 Public Function Layer: rs_servo
+# 4. Public Function Layer: rs_servo
 
 The servo motor public function layer **rs_servo** is detailed here.
 
-## 3.1 Files
+## 4.1 Files
 The source files can be found in the repo's /src folder and are located in the e² studio project's /src/rs_servo_motor folder. 
 
 
@@ -438,10 +528,10 @@ This macro controls whether the GPT timer instance or TAU PWM timer instance wil
 
 In the demo application, the macro "PWM_SERVO_USE_\<Timer Module\>" is defined in the file rs_servo_config_\<RA Device Kit\>_sg90.h
 
-## 3.2 Public Data
+## 4.2 Public Data
 The public data are defined in rs_servo_functions.h. The data is composed of an enumeration for the servo direction, a configuration struct for the servo's specifications, and a control struct for the public function layer.
 
-### 3.2.1 Macros
+### 4.2.1 Macros
 The following macros are defined in the rs_servo_functions.c file and support the public functions.
 
 | Name | Value | Use |
@@ -462,7 +552,7 @@ The following macros are defined in the rs_servo_functions.c file and support th
 #define RS_SERVO_MIN_ANGLE_CFG   (-180)
 ```
 
-### 3.2.2 Servo Direction Enum
+### 4.2.2 Servo Direction Enum
 
 The type *servo_direction_t* provides the directions that can describe the servo's rotation. 
 
@@ -475,7 +565,7 @@ typedef enum e_servo_direction_t
 } servo_direction_t;
 ```
 
-### 3.2.3 Servo Device Configuration
+### 4.2.3 Servo Device Configuration
 
 The type *servo_device_t* is dependent on the selected servo's hardware and describes its PWM pulse's specifications and shaft's rotational direction.
 
@@ -514,7 +604,7 @@ const servo_device_cfg_t g_sg90_motor_cfg =
     .direction = SERVO_DIRECTION_DEFAULT
 };
 ```
-### 3.2.4 Servo Control Block
+### 4.2.4 Servo Control Block
 
 The type *servo_ctrl_t* provides a control block for the **rs_servo** functions. To guarantee proper operation of this layer, application code should never write over any members of a *servo_ctrl_t* instance. 
 
@@ -539,7 +629,7 @@ The SG90 demo application in rs_servo_demo_sg90.c creates a control instance for
 
 > ℹ The main application layer must define a *servo_ctrl_t* instance initialized to 0. This instance will be passed into **rs_servo** function calls. 
 
-## 3.3 Public Functions
+## 4.3 Public Functions
 
 The public functions are defined in the file rs_servo_functions.c. 
 
@@ -561,6 +651,7 @@ This section breaks down the servo functions for a beginner user and an advanced
 | rs_servo_calculate_onetime_values(servo_ctrl_t *) | - | INTERNAL ONLY | During open, calculates runtime values that are used in subsequent calls to WritePercent() or WriteAngle() to calculate the new duty cycle. |
 
 All functions returns a fsp_err_t value to describe the success of the function's operation:
+
 | Error | Description |
 |-|-|
 | *FSP_SUCCESS* | The function returned successfully with no error. |
@@ -570,7 +661,7 @@ All functions returns a fsp_err_t value to describe the success of the function'
 | *FSP_ERR_ALREADY_OPEN* | The module is already open, which is an invalid state. |
 | *FSP_ERR_NOT_OPEN* | The module is not open, which is an invalid state. |
 
-### 3.3.1 rs_servo_SweepRangeOnce() 
+### 4.3.1 rs_servo_SweepRangeOnce() 
 Beginner-level single entry point function to the **rs_servo**. <br>
 Valid Module State: Open and Closed
 
@@ -589,7 +680,7 @@ Error Returns:
 - FSP_INVALID_POINTER
 
 
-### 3.3.2 rs_servo_Open()
+### 4.3.2 rs_servo_Open()
 Advanced-level function to open an instance of **rs_servo**.<br>
 Valid Module State: Closed
 
@@ -611,7 +702,7 @@ This function performs the following operations:
 9. Starts the timer.
 10. Marks the servo instance as open.
 
-### 3.3.3 rs_servo_Close()
+### 4.3.3 rs_servo_Close()
 Advanced-level function to close an instance of **rs_servo**.<br>
 Valid Module State: Closed
 
@@ -620,7 +711,7 @@ fsp_err_t rs_servo_Close(servo_ctrl_t *p_servo_ctrl);
 ```
 Closes the GPT timer instance used by the servo control layer and marks the servo control instance as closed. This function validates that the servo control pointer is not NULL and that the servo instance is currently open before closing the timer.
 
-### 3.3.4 rs_servo_WriteAngle()
+### 4.3.4 rs_servo_WriteAngle()
 Advanced-level function to move the servo to the specified angle.<br>
 Valid Module State: Open
 
@@ -647,7 +738,7 @@ If the servo direction is configured as SERVO_DIRECTION_REVERSE, the adjusted an
 
 After the pulse count is calculated, the function verifies that the resulting duty-cycle value is less than the configured PWM period count, then updates the GPT output duty cycle using the FSP timer API.
 
-### 3.3.5 rs_servo_WritePercent()
+### 4.3.5 rs_servo_WritePercent()
 Advanced-level function to move the servo to the specified angle.<br>
 Valid Module State: Open
 
@@ -671,7 +762,7 @@ If the servo direction is configured as SERVO_DIRECTION_REVERSE, the adjusted pe
 
 This function is useful when the application needs a normalized 0–100 position command instead of an angle-based command.
 
-### 3.3.6 Internal Functions
+### 4.3.6 Internal Functions
 The following helper functions are declared in the rs_servo_functions.h in the current implementation, but they are only used internally by the servo function rs_servo_Open(). 
 
 **Config Gen Function**
@@ -710,7 +801,7 @@ min_duty_counts = (minimum_microseconds * timer_clock_frequency) / RS_SERVO_US_P
 max_duty_counts = (maximum_microseconds * timer_clock_frequency) / RS_SERVO_US_PER_SECOND;
 ```
 
-## 3.4 Demo Application Layer
+## 4.4 Demo Application Layer
 
 The servo application demo's entry is defined in rs_servo_demo.c. It uses the beginner-level single entry point function rs_servo_SweepRangeOnce() to perform repeated sweeps of the SG90 range. During normal operation, the servo moves through every configured angle from -90 degrees to 90 degrees, then returns to -90 degrees and pauses for one second before the next sweep begins.
 
@@ -744,86 +835,6 @@ fsp_err_t servo_demo_entry(void)
     return err;
 }
 ```
-
-***
-
-# 4. Running the Demo Application
-
-The example application titled "PWM_Servo_Motor_FPB_RA2E3" is located in /examples/e2studio and /examples/vscode. 
-
-## 4.1 Required Resources
-To build and run the project, the following resources are needed:
-
-### 4.1.1 Hardware
-* Renesas RA MCU 
-    * FPB-RA0L1
-    * FPB-RA2E3 
-* USB Debug Cable
-* SG90 Servo Motor
-* Jumper Wires to connect SG90 to RA MCU
-
-### 4.1.2 Software
-* e² studio v2026-04.2
-* VS Code with Renesas Platform Extension
-* FSP v6.5.0
-* LLVM for ARM v21.1.1
-
-### 4.1.3 Connect SG90 to FPB-RA0L1 
-Connect the SG90 to the FPB-RA2E3:
-
-    * (+) SG90 goes to (5V) MCU
-    * (-) SG90 goes to (GND) MCU
-    * (PWM) SG90 goes to (P100) MCU
-
-### 4.1.4 Connect SG90 to FPB-RA2E3 
-Connect the SG90 to the FPB-RA2E3:
-
-    * (+) SG90 goes to (5V) MCU
-    * (-) SG90 goes to (GND) MCU
-    * (PWM) SG90 goes to (P212) MCU
-
-## 4.2 Using FSP Stack vs Preset Configurations 
-In the project, the required GPT module settings are saved in flash and at runtime are copied into SRAM for use by the FSP APIs. 
-There are 2 identical flash copies of the required configurations in the project:
-* g_pwm_sg90 
-    * Located in /ra_gen folder in hal_data.c and .h
-    * Data is auto generated based on the project's FSP Stack and Pin configurations
-* g_pwm_sg90_preset
-    * Located in /src/rs_servo_motor directory in rs_servo_config_fpb_ra2e3_sg90. and .h
-    * Data is identical copy of the FSP configurations and is tailored for the hardware
-
-For guaranteed demo operation, do not edit these files or overwrite the project's original FSP Configurations. 
- 
-The following image shows the files containing the flash configuration copies in the project's workspace. The FSP configuration files with flash instance **g_pwm_sg90** are highlighted in orange and those with flash instance **g_pwm_sg90_preset** are highlighted in green.
-
-<img src="images/flash_configs.jpg" alt="Instance g_pwm_sg90 is defined in ra_gen/hal_data.c and .h and instance g_pwm_preset is defined in src/rs_servo_motor/rs_servo_config_fpb_ra2e3_sg90.c and .h" width="800"/><br>
-
-The macro USE_PRESET_CONFIG is defined in the Project Properties > C/C++ Build settings. It determines which flash configuration will be copied into SRAM at runtime. Its value can be set using the project property shown below:
-
-<img src="images/use_preset_config_macro.jpg" alt="Project macros are in the Project Settings > C/C++ Build > Settings > Tool Settings tab > Compiler > Includes > Macro Defines section" width="500"/><br>
-
-The rs_servo_Open() routine automatically calls the internal routine rs_servo_config_gen() with the GPT instance that corresponds to the value of USE_PRESET_CONFIG.
-* USE_PRESET_CONFIG = 1 selects **g_pwm_sg90_preset**
-* USE_PRESET_CONFIG = 0 selects **g_pwm_sg90**
-
-<img src="images/config_gen_in_open.jpg" alt="USE_PRESET_CONFIG Determines the GPT Configuration Instance Used" width="800"/><br>
-
-The SRAM copy is stored as multiple members of the servo control block *servo_ctrl_t* and are highlighted in blue below. The configurations are additionally wrapped up by a public timer instance in SRAM highlighted in purple.
-
-<img src="images/sram_copy.jpg" alt="The SRAM Copy Is a Member of the Servo Control Block" width="400"/><br>
-
-The rs_servo_config_gen() routine first copies the GPT configuration flash instances into the servo control block, then it wraps them all in the public timer instance:
-
-<img src="images/config_gen_copy.jpg" alt="The Internal Routine ConfigbGen Automatically Copies Flash Configurations into SRAM" width="800"/><br>
-
-## 4.3 Note on SG90 Angle Response
-The SG90 datasheet commonly specifies a control pulse width range of 1 ms to 2 ms, corresponding to approximately -90° to +90° (180° total travel). In practice, however, the SG90 is a low-cost hobby servo and its actual mechanical range can vary significantly between units.
-
-Many SG90 servos do not achieve a full 180° sweep when driven with 1 ms and 2 ms pulse widths. Manufacturing tolerances, gear alignment, internal potentiometer calibration, and mechanical end stops often limit the usable travel to less than the advertised range. It is therefore normal to observe total motion less than 180°, sometimes as limited as 90°.
-
-For applications requiring precise angular positioning, the relationship between pulse width and output angle can be characterized experimentally on the target hardware rather than relying solely on the values stated in the datasheet. However, driving beyond the servo's actual mechanical limits can cause increased current consumption, audible buzzing, heat generation, and premature wear.
-
-The risk of experimental maximum and minimum microsecond settings is assumed by the user. 
 
 ***
 
