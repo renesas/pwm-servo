@@ -19,3 +19,6 @@
 [submodule "rtc-event-logger"]
 	path = rtc-event-logger
 	url = https://github.com/renesas/rtc-logger
+[submodule "pwm-servo-motor"]
+	path = pwm-servo-motor
+	url = https://github.com/renesas/pwm-servo
