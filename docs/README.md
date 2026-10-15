@@ -100,7 +100,7 @@ The example application titled "PWM_Servo_Motor_FPB_RA2E3" is located in /exampl
 ## 1.1 Required Resources
 To build and run the project, the following resources are needed:
 
-### 4.1.1 Hardware
+### 1.1.1 Hardware
 * Renesas RA MCU 
     * FPB-RA0L1
     * FPB-RA2E3 
