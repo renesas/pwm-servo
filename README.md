@@ -31,53 +31,78 @@ Once you have met the [minimum requirements for reusable software](README.md#min
 
 ## Adding a Submodule
 
+Contributors with Developer access should make changes on a feature branch and submit a Merge Request (MR) for review. Do not make changes directly on the `main` branch.
+
 1. Identify the repository that will be shared through **xplore**.
 
 2. Select the release tag that should be exposed to users.
+
    - Only approved and validated release tags should be used.
 
-3. Perform a Git pull of the repo
-      ```bash
+3. Update your local copy of the **xplore** repository:
+
+   ```bash
+   git checkout main
    git pull origin main
    ```
 
-4. Add the repository as a Git submodule:
+4. Create a new branch for the change:
+
+   ```bash
+   git checkout -b add-<submodule-name>
+   ```
+
+5. Add the repository as a Git submodule:
 
    ```bash
    git submodule add <repository-url> <submodule-path>
    ```
 
-5. Initialize and update the submodule:
+   This updates the `.gitmodules` file and adds the submodule to the **xplore** repository.
 
-   ```bash
-   git submodule update --init <submodule-name>
-   ```
-
-6. Check out the selected release tag within the submodule:
+6. Check out the approved release tag within the submodule:
 
    ```bash
    cd <submodule-path>
+   git fetch --tags
    git checkout <tag>
    cd ..
    ```
 
-7. Commit the updated submodule reference in the **xplore** repository to pin the submodule to the selected tag:
+7. Verify that the submodule is pinned to the expected revision:
 
    ```bash
-   git add <submodule-path>
+   git submodule status
+   ```
+
+8. Stage the `.gitmodules` file and submodule reference:
+
+   ```bash
+   git add .gitmodules <submodule-path>
+   ```
+
+9. Commit the changes:
+
+   ```bash
    git commit -m "Add <submodule-name> at <tag>"
    ```
 
-## Submitting Changes
+10. Push the branch to the remote repository:
 
-1. Push your branch to the remote repository.
+    ```bash
+    git push -u origin add-<submodule-name>
+    ```
 
-2. Submit a pull request containing:
-   - The new submodule entry.
-   - The pinned submodule revision corresponding to the approved tag.
-   - A brief description of the repository and selected release tag.
+11. Create a Merge Request (MR) from the new branch into `main`.
 
-3. Wait for review and approval before merging.
+    The Merge Request should identify:
+
+    - The submodule being added.
+    - The selected release tag.
+    - The reason the submodule is being added to **xplore**.
+    - Any applicable validation or release information.
+
+12. After the Merge Request has been reviewed and approved, it can be merged into `main` by a user with the appropriate repository permissions.
 
 ## Terminology Notes
 
