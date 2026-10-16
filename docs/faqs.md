@@ -114,24 +114,41 @@ Typical reasons include:
 A typical migration workflow is:
 
 ```bash
+# First, create an update branch from Main of the Repo to use for the Merge Request: for example, mr-update
+
+# Clone the repository
+git clone <old-repository-url>
+cd <repository-directory>
+
+# Create a local update branch based on main
+git switch -c mr-update
+
+# Verify branch
+git status
+
 # Remove existing submodule
 git rm ./old-submodule
 git commit -m "Remove old submodule"
 
-# Add replacement submodule
+# Add replacement submodule (from new-repository-url)
 git submodule add <new-repository-url> ./new-submodule
 
-# Pin to a known-good version
+# Pin replacement submodule to known-good commit
 cd ./new-submodule
 git checkout <commit-hash>
 cd ..
 
-# Record the new submodule state
+# Record the replacement submodule
 git add .gitmodules ./new-submodule
 git commit -m "Add new submodule and pin version"
 
-# Publish the changes
-git push origin main
+# Publish branch
+git push origin mr-update
+
+# Create Merge Request:
+# mr-update -> main
+#
+# Assign a reviewer with permission to merge the MR
 ```
 
 If you run into remote issues you can try
