@@ -19,3 +19,6 @@
 [submodule "rtc-event-logger"]
 	path = rtc-event-logger
 	url = https://github.com/renesas/rtc-logger.git
+[submodule "bit-banged-uart-tx"]
+	path = bit-banged-uart-tx
+	url = https://github.com/renesas/bb-uart-tx
