@@ -22,3 +22,6 @@
 [submodule "bit-banged-uart-tx"]
 	path = bit-banged-uart-tx
 	url = https://github.com/renesas/bb-uart-tx
+[submodule "greenpak-i2c"]
+	path = greenpak-i2c
+	url = https://github.com/renesas/greenpak-i2c
