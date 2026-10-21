@@ -1,6 +1,3 @@
-[submodule "mqtt-da16600"]
-	path = mqtt-da16600
-	url = git@gitlab.global.renesas.com:mcusys/pes-mqtt-da16600.git
 [submodule "debounce"]
 	path = debounce
 	url = https://github.com/renesas/gpio-debounce.git
@@ -25,3 +22,6 @@
 [submodule "greenpak-i2c"]
     path = greenpak-i2c
     url = https://github.com/renesas/greenpak-i2c
+[submodule "MQTT-DA16600"]
+	path = MQTT-DA16600
+	url = https://github.com/renesas/MQTT-DA16600
