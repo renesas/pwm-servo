@@ -1,6 +1,3 @@
-[submodule "smooth-lighting-controller"]
-	path = smooth-lighting-controller
-	url = git@gitlab.global.renesas.com:mcusys/rs-smooth-lighting-controller.git
 [submodule "mqtt-da16600"]
 	path = mqtt-da16600
 	url = git@gitlab.global.renesas.com:mcusys/pes-mqtt-da16600.git
@@ -20,8 +17,11 @@
 	path = rtc-event-logger
 	url = https://github.com/renesas/rtc-logger.git
 [submodule "bit-banged-uart-tx"]
-	path = bit-banged-uart-tx
-	url = https://github.com/renesas/bb-uart-tx
+    path = bit-banged-uart-tx
+    url = https://github.com/renesas/bb-uart-tx
+[submodule "smooth-lighting-controller"]
+    path = smooth-lighting-controller
+    url = https://github.com/renesas/smooth-lighting
 [submodule "greenpak-i2c"]
-	path = greenpak-i2c
-	url = https://github.com/renesas/greenpak-i2c
+    path = greenpak-i2c
+    url = https://github.com/renesas/greenpak-i2c
