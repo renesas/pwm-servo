@@ -22,3 +22,6 @@
 [submodule "greenpak-i2c"]
     path = greenpak-i2c
     url = https://github.com/renesas/greenpak-i2c
+[submodule "MQTT-DA16600"]
+	path = MQTT-DA16600
+	url = https://github.com/renesas/MQTT-DA16600
