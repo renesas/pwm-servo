@@ -6,7 +6,7 @@
 	url = git@gitlab.global.renesas.com:mcusys/pes-mqtt-da16600.git
 [submodule "debounce"]
 	path = debounce
-	url = git@gitlab.global.renesas.com:mcusys/gpio-debouncing.git
+	url = https://github.com/renesas/gpio-debounce.git
 [submodule "adc"]
 	path = adc
 	url = git@gitlab.global.renesas.com:mcusys/pes-adc.git
