@@ -19,3 +19,6 @@
 [submodule "bit-banged-uart-tx"]
 	path = bit-banged-uart-tx
 	url = https://github.com/renesas/bb-uart-tx
+[submodule "smooth-lighting-controller"]
+	path = smooth-lighting-controller
+	url = https://github.com/renesas/smooth-lighting
