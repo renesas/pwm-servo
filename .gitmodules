@@ -25,3 +25,7 @@
 [submodule "MQTT-DA16600"]
 	path = MQTT-DA16600
 	url = https://github.com/renesas/MQTT-DA16600
+[submodule "i2c-control-interrupt-driven"]
+	path = i2c-control-interrupt-driven
+	url = https://github.com/renesas/i2c-control-interrupt-driven.git
+	branch = i2c-control-interrupt-driven
