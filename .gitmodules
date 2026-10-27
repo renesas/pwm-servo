@@ -29,3 +29,6 @@
 	path = i2c-control-interrupt-driven
 	url = https://github.com/renesas/i2c-control-interrupt-driven.git
 	branch = i2c-control-interrupt-driven
+[submodule "spi-display"]
+	path = spi-display
+	url = https://github.com/renesas/spi-display
